@@ -1,0 +1,224 @@
+/* Font & Reset */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Navbar */
+.navbar {
+    background: #DCE0E6;
+    display: flex;
+    justify-content: space-between;
+    padding: 0rem 4rem;
+    align-items: center;
+    flex-wrap: wrap;
+    font-weight: bold;
+}
+
+.logo-warung {
+    width: 80px;
+    height: auto;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-right{
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+}
+
+.navbar-right .icon {
+    font-size: 20px;
+    color: #000000;
+    transition: color 0.3s;
+    cursor: pointer;
+}
+
+.navbar-right .icon:hover {
+    color: #B80000;
+}
+
+.icon-group {
+    display: flex;
+    gap: 20px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.navbar nav a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+.navbar nav a:hover {
+    color: #B80000;
+}
+
+.btn-pesan {
+    background: #FFD600;
+    padding: 10px 16px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-pesan:hover {
+    background-color: #fffb00;
+} 
+
+.icon-group .icon {
+    margin-left: 15px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* Info UMKM */
+.info-umkm {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #f1f1f1;
+}
+
+.info-umkm h3 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.info-umkm p {
+    font-size: 18px;
+    max-width: 1000px;
+    margin: 0 auto;
+    line-height: 1.8;
+    text-align: justify;
+}
+
+/*visi misi*/
+   .visi-misi {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            padding: 0;
+        }
+
+        .visi, .misi {
+            width: 50%;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        .visi {
+            background-color: #B80000; /* Merah muda */
+        }
+
+        .misi {
+            background-color: #FFD600; /* Kuning pucat */
+        }
+
+        .visi h2, .misi h2 {
+            font-size: 26px;
+            margin-bottom: 10px;
+            color: #f0b84a;
+            border-left: 4px solid #f0b84a;
+            padding-left: 12px;
+        }
+          .misi h2 {
+            font-size: 26px;
+            margin-bottom: 10px;
+            color: #B80000;
+            border-left: 4px solid #B80000;
+            padding-left: 12px;
+        }
+        
+
+        .visi p, .misi p {
+            font-size: 17px;
+            line-height: 1.7;
+            color: #ffffff;
+            max-width: 95%;
+        }
+
+        /* Responsif: tampil atas-bawah saat layar kecil */
+        @media (max-width: 768px) {
+            .visi-misi {
+                flex-direction: column;
+            }
+
+            .visi, .misi {
+                width: 100%;
+            }
+        }
+
+/* Cabang Warung */
+.cabang-warung {
+    padding: 60px 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+.cabang-warung h2 {
+    font-size: 28px;
+    margin-bottom: 40px;
+}
+
+.cabang-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+}
+
+.cabang-card {
+    background-color: #fff;
+    width: 300px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.cabang-card:hover {
+    transform: translateY(-5px);
+}
+
+.cabang-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.cabang-card h3 {
+    margin: 15px 0 10px;
+    font-size: 20px;
+}
+
+.cabang-card p {
+    padding: 0 15px 20px;
+    font-size: 16px;
+}
+
+/* Footer */
+footer {
+    background: #FFD600;
+    display: flex;
+    justify-content: space-around;
+    padding: 1.5rem;
+    font-size: 14px;
+    text-align: center;
+}
+
+.footer-item {
+    margin: 0.5rem;
+}

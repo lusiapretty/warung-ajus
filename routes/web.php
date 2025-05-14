@@ -21,6 +21,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/tentang', [PageController::class, 'tentang']);
+Route::get('/tentang', [PageController::class, 'tentang'])->name('tentang');
 Route::get('/menu', [PageController::class, 'menu']);
 Route::get('/pesan', [PageController::class, 'pesan']);

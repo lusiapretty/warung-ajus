@@ -17,7 +17,7 @@
         </div>
             <nav>
                     <a href="#beranda">Beranda</a>
-                    <a href="#tentangkami">Tentang Kami</a>
+                    <a href="{{ route('tentang') }}">Tentang Kami</a>
                     <a href="#menu">Menu</a>
                     <a href="#kontak">Kontak</a>
             </nav>
@@ -78,7 +78,7 @@
 
     <footer id="kontak">
         <div class="footer-item">📍 Alamat <br> Jl. Goa gong No.3 Jimbaran</div>
-        <div class="footer-item">⏰ Jam Operasional <br> Senin - Sabtu: 08.00 - 16.00</div>
+        <div class="footer-item">⏰ Jam Operasional <br> Senin - Jumat: 08.00 - 19.00</div>
         <div class="footer-item">📞 No Telp <br> 087887920415 </div>
     </footer>
     
