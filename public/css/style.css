@@ -76,44 +76,94 @@ body {
 }  
 
 .hero {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #FFD600;
-    padding: 3rem 2rem;
-    flex-wrap: wrap;
+  position: relative;
+  height: 100vh; /* agar background full tinggi layar */
+  overflow: hidden;
+}
+
+.hero-bg-top,
+.hero-bg-bottom {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  z-index: 0;
+}
+
+.hero-bg-top {
+  top: 0;
+  height: 100%;
+  background-color: #A81C1C;
+}
+
+.hero-bg-bottom {
+  top: 40%;
+  height: 60%;
+  background-color: #FFD700;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 3rem 2rem;
+  height: 100%;
+  flex-wrap: wrap;
 }
 
 .hero-text {
-    max-width: 50%;
+  max-width: 50%;
+  color: #000;
 }
 
-.hero-text h1{
-    font-size: 3.5rem;
-    margin: 0;
-    line-height: 1.2;
-    margin-bottom: 50px;
+.hero-title h1 {
+  font-size: 5.5rem;
+  color: #FFDE59;
+  margin-bottom: 1rem;
+  margin-top: -15px;
+  padding-left: 40px; 
 }
 
-.hero-text h3 {
-    color: #B80000;
-    font-size: 1.5rem;
-    margin: 0;
-    line-height: 1.2;
+.hero-title .bold {
+  font-weight: bold;
 }
 
-.hero-text p {
-    margin: 1rem 0;
-    line-height: 1.5;
-    font-weight: bold;
+.hero-title .italic {
+  font-style: italic;
+}
+
+.hero-description {
+  background-color: transparent;
+  margin-top: 50px;
+
+}
+
+.hero-description h3 {
+  color: #B80000;
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  padding-left: 40px; 
+ 
+}
+
+.hero-description p {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+  font-weight: bold;
+  color: #000;
+  padding-left: 40px; 
 }
 
 .hero-images img {
-    max-width: 400px;
-    border-radius: 16px;
-    width: 100%;
-    height: auto;
+  max-width: 550px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: flex-start; 
+  padding-right: 50px; 
 }
+
+
 
 .bold {
     font-weight: bold;
@@ -121,7 +171,7 @@ body {
 
 .italic {
     font-style: italic;
-    color: red;
+    color: rgb(255, 255, 255);
 }
 
 .btn-cta {
@@ -138,37 +188,75 @@ body {
     background-color: #8f0000;
 }    
 
-.menu-favorit {
-    background: #fff;
-    text-align: center;
-    padding: 2rem 1rem;
+/* START MENU FAVORIT */
+
+.menu-favorit-card {
+  position: relative;
+  z-index: 10;
+  padding: 20px 15px;
+  background-color: #B80000;
 }
 
-.menu-favorit h2 {
-    font-size: 2rem;
-    color: #B80000;
-    margin-bottom: 1.5rem;
+/* Card utama */
+.card-menu {
+  background-color: #ffffff;
+  border-radius: 60px;
+  padding: 40px 30px;
+  max-width: 900px;
+  margin: 0 auto;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  margin-top: -120px;
 }
 
+/* Judul */
+.menu-title {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 30px;
+  color: #7a0000;
+  width: 100%;
+  display: block;
+}
+
+/* Daftar menu */
 .menu-list {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem; /* jarak antar item */
+  flex-wrap: wrap;
 }
 
+/* Item menu */
 .menu-item {
-    text-align: center;
-    width: 150px;
+  text-align: center;
+  width: 180px; /* cukup besar untuk gambar */
+  transition: transform 0.3s ease;
+}
+
+.menu-item:hover {
+  transform: scale(1.05);
 }
 
 .menu-item img {
-    width: 100px;
-    max-width: 120px;
-    height: auto;
-    margin-bottom: 0.5rem;
-    border-radius: 8px;
+  width: 170px;
+  height: 170px;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border-radius: 20px; /* pojok melengkung, bukan bulat */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border: 4px solid white;
 }
+
+/* Deskripsi */
+.menu-desc {
+  font-weight: bold;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+/* END MENU FAVORIT */
+
 
 .info-umkm {
     display: flex;
@@ -178,6 +266,7 @@ body {
     color: white;
     padding: 2rem;
     flex-wrap: wrap;
+    margin-top: -15px;
 }
 
 .info-left {
@@ -188,25 +277,30 @@ body {
 }
 
 .info-left img.logo-warung {
-    width: 420px;
+    width: 500px;
     height: auto;
+    padding-right: 70px;
 }
 
 .info-right {
     max-width: 55%;
+     padding-left: 50px;
 }
 
 .info-right h3 {
     font-size: 28px;
     margin-bottom: 10px;
     color: #333;
+    padding-left: 50px;
 }
 
 .info-right p {
     font-size: 18px;
-    margin-bottom: 20px;
-    color: #fffdfd;
-}
+    max-width: 1000px;
+    margin: 0 auto;
+    line-height: 1.8;
+    text-align: justify;
+     padding-left: 50px;}
 
 footer {
     background: #FFD600;
@@ -258,14 +352,18 @@ footer {
     font-size: 16px;
     padding: 8px 16px;
     margin-top: 1rem;
+     margin-left: 40px;
     border-radius: 10px;
     text-decoration: none;
     cursor: pointer;
+   
 }
 
 .btn-selengkapnya:hover {
     background: #B80000;
     color: white;
+     margin-left: 40px;
+    
 }
 /* 
 footer {
