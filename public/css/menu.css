@@ -1,0 +1,255 @@
+    .hero-section {
+      background-color: #E2D3D3;
+      text-align: center;
+      padding: 25px 0;
+    }
+
+    .hero-section h1 {
+      font-weight: bold;
+      font-size: 2.5rem;
+    }
+
+    .menu-section {
+      background-color: #B80000;
+      padding: 40px 0;
+      text-align: center;
+    }
+
+    .menu-section h2 {
+      color: white;
+      font-weight: bold;
+    }
+
+    .menu-section p {
+      font-weight: bold;
+    }
+
+    /* .filter-buttons button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 20px;
+      border: none;
+      font-size: large;
+    } */
+
+    .filter-btn {
+      padding: 10px 20px;
+      background-color: transparent;
+      color: white;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 16px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+
+    .filter-btn.active {
+      background-color: #00000033;
+      font-weight: bold;
+    }
+
+    .filter-buttons .active {
+      background-color: #FFD600;
+      color: black;
+    }
+
+    .menu-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .menu-item {
+      background-color: #ECECEC;
+      border-radius: 20px;
+      width: 250px;
+      text-align: center;
+      padding: 15px;
+    }
+
+    .menu-item img {
+      width: 100%;
+      border-radius: 15px;
+      height: 140px;
+      object-fit: cover;
+    }
+    
+    .menu-item.hover {
+      transform: scale(1.03);
+      transition: 0.3s ease-in-out;
+      cursor: pointer;
+    }
+
+    .menu-item i.fas.fa-plus {
+      background-color: #FFD600;
+      padding: 8px;
+      border-radius: 50%;
+      margin-top: 10px;
+      color: black;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .menu-item i.fas.fa-plus:hover {
+      background-color: #E5C100;
+    }
+
+    .menu-item h5, .menu-item p {
+      margin: 10px 0 5px;
+    }
+
+
+    /* Responsif untuk Mobile (max-width: 600px) - 1 kolom */
+    @media (max-width: 600px) {
+      .menu-grid {
+        flex-direction: column;
+        align-items: center;
+      }
+      .menu-item {
+        width: 90%;
+      }
+    }
+
+
+
+    /* Blur ketika modal aktif */
+    /* body.blurred {
+      filter: blur(5px);
+      pointer-events: none;
+      user-select: none;
+    } */
+
+    /* Overlay */
+    .addon-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 1000;
+    }
+
+
+    /* Modal Box */
+    .addon-modal {
+      background-color: #fff;
+      padding: 20px 30px;
+      border-radius: 15px;
+      width: 400px;
+      max-height: 90hv;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-image {
+      width: 75%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .modal-price {
+      color: green;
+      font-weight: bold;
+    }
+
+    .menu-contents li {
+      list-style-type: disc;
+      margin-left: 20px;
+    }
+
+    .addon-list label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 5px 0;
+      cursor: pointer;
+    }
+
+    .addon-list input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    .catatan-input {
+      width: 100%;
+      margin-top: 10px;
+      height: 60px;
+    }
+
+    .quantity-control {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .quantity-control button {
+      width: 30px;
+      height: 30px;
+      font-size: 18px;
+    }
+
+    .add-to-cart-btn {
+      width: 100%;
+      padding: 10px;
+      background-color: orange;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .addon-modal h3 {
+      margin-bottom: 15px;
+    }
+
+    .addon-modal button {
+      background-color: #B80000;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 15px;
+    }    
+
+    .addon-content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+    }
+
+    .addon-content label {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+
+
