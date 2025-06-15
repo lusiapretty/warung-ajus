@@ -6,6 +6,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/tentang', [PageController::class, 'tentang'])->name('tentang');
-Route::get('/menu', [PageController::class, 'menu']);
+Route::get('/menu', [PageController::class, 'menu'])->name('menu.pelanggan');
 Route::get('/pesan', [PageController::class, 'pesan']);
 Route::get('/menu-makanan', function () {
     return view('menu-makanan');
@@ -49,12 +50,18 @@ Route::get('/menu-minuman', function () {
 
 // Admin Routes
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    // Route::get('/admin/index', [AdminController::class, 'index'])->name('admin.index');
+    // Dashboard Route
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/menu', [AdminController::class, 'index'])->name('admin.menu.index'); // Daftar Menu admin
-    Route::post('/menu', [AdminController::class, 'store'])->name('admin.menu.store');
-    Route::put('/menu/{id}', [AdminController::class, 'update'])->name('admin.menu.update');
-    Route::delete('/menu/{id}', [AdminController::class, 'destroy'])->name('admin.menu.destroy');
+
+    // Menu Routes
+    Route::get('/admin/menu', [AdminController::class, 'index'])->name('admin.menu.index'); // Daftar Menu admin
+    Route::get('/menu/create', [AdminController::class, 'create'])->name('admin.menu.create');
+    Route::post('/admin/menu/store', [AdminController::class, 'store'])->name('admin.menu.store');
+    Route::get('/admin/menu/{id}/edit', [AdminController::class, 'edit'])->name('admin.menu.edit');
+    Route::put('/admin/menu/update/{id}', [AdminController::class, 'update'])->name('admin.menu.update');
+    Route::delete('/admin/menu/{id}', [AdminController::class, 'destroy'])->name('admin.menu.destroy');
+    Route::get('/admin/menu/{id}', [AdminController::class, 'show']);
+
 });
 
 
