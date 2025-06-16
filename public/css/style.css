@@ -365,6 +365,107 @@ footer {
      margin-left: 40px;
     
 }
+
+/*ikon user*/
+.user-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.user-dropdown {
+  position: absolute;
+  right: 0;
+  top: 120%;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: 240px;
+  border-radius: 10px;
+  z-index: 999;
+  padding: 15px;
+  border: 1px solid #dc3545;
+}
+
+.user-dropdown.hidden {
+  display: none;
+}
+
+.dropdown-header {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+}
+
+.dropdown-header p {
+  margin: 0;
+  font-size: 16px;
+  color: #dc3545;
+}
+
+.dropdown-header small {
+  color: #666;
+}
+
+.dropdown-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+}
+
+.dropdown-list li {
+  margin: 8px 0;
+}
+
+.dropdown-list a {
+  text-decoration: none;
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.dropdown-list a i {
+  margin-right: 6px;
+}
+
+.dropdown-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.login-btn, .register-btn {
+  padding: 8px;
+  text-align: center;
+  border-radius: 5px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.login-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.register-btn {
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  background-color: white;
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.logout-btn:hover {
+  background-color: #c82333;
+}
+
 /* 
 footer {
     background: #FFD600;

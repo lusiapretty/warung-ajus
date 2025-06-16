@@ -17,26 +17,58 @@
 
 <body>
   <header class="navbar">
-    <div class="navbar-left">
-      <img src="{{ asset('img/logo-warung.png') }}" alt="Logo Warung" class="logo-warung">
-    </div>
-    <nav>
-      <a href="#beranda">Beranda</a>
-      <a href="{{ route('tentang') }}">Tentang Kami</a>
-      <a href="#menu">Menu</a>
-      <a href="#kontak">Kontak</a>
-    </nav>
-    <a href="#pesan" class="btn-pesan">Pesan Sekarang</a>
-    <div class="navbar-right">
-      <div class="icon-group">
-        <i class="fas fa-shopping-cart icon"></i>
-        <i class="fas fa-user icon"></i>
+  <div class="navbar-left">
+    <img src="{{ asset('img/logo-warung.png') }}" alt="Logo Warung" class="logo-warung">
+  </div>
+
+  <nav>
+    <a href="#beranda">Beranda</a>
+    <a href="{{ route('tentang') }}">Tentang Kami</a>
+    <a href="#menu">Menu</a>
+    <a href="#kontak">Kontak</a>
+  </nav>
+
+  <a href="#pesan" class="btn-pesan">Pesan Sekarang</a>
+
+  <div class="navbar-right">
+    <div class="icon-group">
+      <i class="fas fa-shopping-cart icon"></i>
+
+      <!-- user-->
+      <div class="user-dropdown-wrapper">
+        <div class="user-icon" onclick="toggleUserDropdown()">
+          <i class="fas fa-user icon"></i>
+        </div>
+
+        <div id="userDropdown" class="user-dropdown hidden">
+          @if(Auth::check() && Auth::user()->role === 'pelanggan')
+            <div class="dropdown-header">
+              <p>Halo, {{ Auth::user()->name }}</p>
+              <small>Kelola akun & pesanan</small>
+            </div>
+            <ul class="dropdown-list">
+              <li><a href="#"><i class="fas fa-user"></i> Profil Saya</a></li>
+              <li><a href="#"><i class="fas fa-box"></i> Pesanan Saya</a></li>
+              </ul>
+            <form method="POST" action="{{ route('logout') }}">
+              @csrf
+              <button type="submit" class="logout-btn">Logout</button>
+            </form>
+          @else
+            <div class="dropdown-header">
+              <p>Selamat Datang di Warung Ajus</p>
+              <small>Akses akun & kelola pesanan</small>
+            </div>
+            <div class="dropdown-actions">
+              <a href="{{ route('login') }}" class="btn login-btn">Login</a>
+              <a href="{{ route('register') }}" class="btn register-btn">Daftar</a>
+            </div>
+          @endif
+        </div>
       </div>
     </div>
-  </header>
-
-
-
+  </div>
+</header>
 
   <section class="hero">
     <div class="hero-bg-top"></div>
@@ -93,10 +125,6 @@
     </div>
   </section>
 
-
-
-
-
   <section class="info-umkm" id="tentangkami">
     <div class="info-right" data-aos="fade-right">
       <h3>INFORMASI UMKM</h3>
@@ -127,6 +155,23 @@
   <script>
     AOS.init();
   </script>
+
+<!--untuk ikon user-->
+  <script>
+  function toggleUserDropdown() {
+    const dropdown = document.getElementById('userDropdown');
+    dropdown.classList.toggle('hidden');
+  }
+
+  // Menutup dropdown 
+  window.addEventListener('click', function (e) {
+    const icon = document.querySelector('.user-icon');
+    const dropdown = document.getElementById('userDropdown');
+    if (!icon.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.classList.add('hidden');
+    }
+  });
+</script>
 
 </body>
 
