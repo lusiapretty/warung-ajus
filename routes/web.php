@@ -7,9 +7,11 @@ use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use App\Http\Controllers\PelangganController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +30,11 @@ Route::get('/menu-makanan', function () {
 Route::get('/menu-minuman', function () {
     return view('menu-minuman');
 })->name('menu-minuman');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profil', [ProfileController::class, 'edit'])->name('profil.edit');
+    Route::post('/profil', [ProfileController::class, 'update'])->name('profil.update');
+});
 
 // ===== Auth Routes =====
 // Login
@@ -87,7 +94,6 @@ Route::middleware(['auth', 'role:pelanggan'])->get('/home', function () {
 
 // ===== Admin Routes =====
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    // Dashboard Route
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
     // Menu Routes
@@ -98,4 +104,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::put('/admin/menu/update/{id}', [AdminController::class, 'update'])->name('admin.menu.update');
     Route::delete('/admin/menu/{id}', [AdminController::class, 'destroy'])->name('admin.menu.destroy');
     Route::get('/admin/menu/{id}', [AdminController::class, 'show']);
+
+    //PELANGGAN
+    Route::middleware(['auth', 'role:admin'])->group(function () {
+      Route::get('/admin/pelanggan', [\App\Http\Controllers\PelangganController::class, 'index'])->name('admin.pelanggan.index');
+});
 });
