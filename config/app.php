@@ -69,7 +69,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+   'timezone' => env('APP_TIMEZONE', 'Asia/Makassar'),
+
 
     /*
     |--------------------------------------------------------------------------
@@ -195,6 +196,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        Yajra\DataTables\DataTablesServiceProvider::class,
     ],
 
     /*

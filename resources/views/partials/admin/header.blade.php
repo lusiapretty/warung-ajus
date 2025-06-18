@@ -29,7 +29,7 @@
         data-bs-auto-close="outside"
         aria-expanded="false"
       >
-        <img src="template/dist/assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+        <img src="{{ asset('img/logo-admin.png')}}" alt="user-image" class="user-avtar">
         <span>Admin</span>
       </a>
     </li>

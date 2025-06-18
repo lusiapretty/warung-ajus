@@ -17,5 +17,15 @@ class Menu extends Model
         'gambar'
     ];
 
-    
+
+
+    public function addons()
+    {
+        return $this->belongsToMany(Addon::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }
