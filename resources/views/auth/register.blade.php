@@ -40,13 +40,18 @@
     position: relative;
   }
 
-  .form-group input {
-    width: 100%;
-    padding: 8px 8px 8px 8px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 13px;
-  }
+ .form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  margin-bottom: 12px;
+}
 
   .form-group input:focus {
     border-color: #f39c12;

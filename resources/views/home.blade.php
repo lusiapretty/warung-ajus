@@ -9,56 +9,6 @@
 <section class="hero">
   <div class="hero-bg-top"></div>
   <div class="hero-bg-bottom"></div>
-
-<body>
-  <header class="navbar">
-
-  <div class="navbar-right">
-
-      <!-- user-->
-      <!-- user -->
-<div class="user-dropdown-wrapper">
-  <div class="user-icon" onclick="toggleUserDropdown()">
-    <i class="fas fa-user icon"></i>
-  </div>
-
-  <div id="userDropdown" class="user-dropdown hidden">
-    @if(Auth::check() && Auth::user()->role === 'pelanggan')
-      <div class="dropdown-header">
-        <p>Halo, <strong>{{ Auth::user()->name }}</strong></p>
-        <small>Kelola akun & pesanan Anda</small>
-      </div>
-
-      <ul class="dropdown-list">
-        <li><a href="{{ route('profil.edit') }}"><i class="fas fa-user-circle"></i> Profil Saya</a></li>
-        <li><a href="#"><i class="fas fa-box-open"></i> Pesanan Saya</a></li>
-      </ul>
-
-      <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit" class="btn logout-btn">Logout</button>
-      </form>
-
-    @else
-      <div class="dropdown-header">
-        <p>Selamat Datang di <strong>Warung Ajus</strong></p>
-        <small>Akses akun & kelola pesanan</small>
-      </div>
-
-      <div class="dropdown-actions">
-        <a href="{{ route('login') }}" class="btn login-btn">Login</a>
-        <a href="{{ route('register') }}" class="btn register-btn">Daftar</a>
-      </div>
-    @endif
-  </div>
-</div>
-
-</header>
-
-<!-- Hero Section -->
-<section class="hero">
-  <div class="hero-bg-top"></div>
-  <div class="hero-bg-bottom"></div>
   
   <div class="hero-content">
     <div class="hero-text">
@@ -129,22 +79,5 @@
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>
   AOS.init();
-</script>
-
-<!--untuk ikon user-->
-  <script>
-  function toggleUserDropdown() {
-    const dropdown = document.getElementById('userDropdown');
-    dropdown.classList.toggle('hidden');
-  }
-
-  // Menutup dropdown 
-  window.addEventListener('click', function (e) {
-    const icon = document.querySelector('.user-icon');
-    const dropdown = document.getElementById('userDropdown');
-    if (!icon.contains(e.target) && !dropdown.contains(e.target)) {
-      dropdown.classList.add('hidden');
-    }
-  });
 </script>
 @endsection
