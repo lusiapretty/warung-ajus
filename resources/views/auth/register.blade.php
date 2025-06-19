@@ -151,27 +151,67 @@
     </form>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      function setupToggle(toggleId, inputId) {
-        const toggle = document.getElementById(toggleId);
-        const input = document.getElementById(inputId);
-        const icon = toggle.querySelector('i');
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 👁 Toggle tampil/sembunyi password
+    function setupToggle(toggleId, inputId) {
+      const toggle = document.getElementById(toggleId);
+      const input = document.getElementById(inputId);
+      const icon = toggle.querySelector('i');
 
-        toggle.addEventListener('click', () => {
-          if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.replace('fa-eye', 'fa-eye-slash');
-          } else {
-            input.type = 'password';
-            icon.classList.replace('fa-eye-slash', 'fa-eye');
-          }
-        });
+      toggle.addEventListener('click', () => {
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+          input.type = 'password';
+          icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+      });
+    }
+
+    setupToggle('toggle-password', 'password');
+    setupToggle('toggle-password-confirmation', 'password_confirmation');
+
+    // 🛡 Validasi Password (opsional tapi disarankan)
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('password_confirmation');
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', function (e) {
+      const password = passwordInput.value;
+      const confirm = confirmInput.value;
+      const hasUppercase = /[A-Z]/.test(password);
+
+      // Hapus pesan error lama
+      document.querySelectorAll('.js-password-error').forEach(el => el.remove());
+
+      let isValid = true;
+
+      // Validasi password
+      if (password.length < 6 || !hasUppercase) {
+        const error = document.createElement('div');
+        error.className = 'error-message js-password-error';
+        error.textContent = 'Password minimal 6 karakter dan mengandung huruf besar.';
+        passwordInput.parentNode.appendChild(error);
+        isValid = false;
       }
 
-      setupToggle('toggle-password', 'password');
-      setupToggle('toggle-password-confirmation', 'password_confirmation');
+      // Validasi konfirmasi password
+      if (password !== confirm) {
+        const error = document.createElement('div');
+        error.className = 'error-message js-password-error';
+        error.textContent = 'Ulangi kata sandi tidak cocok.';
+        confirmInput.parentNode.appendChild(error);
+        isValid = false;
+      }
+
+      // Jika ada error, cegah form dikirim
+      if (!isValid) {
+        e.preventDefault();
+      }
     });
-  </script>
+  });
+</script>
 </body>
 </html>

@@ -3,6 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>Reset Password</title>
+</head>
+<body>
+  <h2>Reset Kata Sandi</h2>
+
+  <form method="POST" action="{{ route('password.update') }}">
+      @csrf
+
+      <input type="hidden" name="token" value="{{ $token }}">
+      <label>Email</label><br>
+      <input type="email" name="email" required><br><br>
+
+      <label>Password Baru</label><br>
+      <input type="password" name="password" required><br><br>
+
+      <label>Konfirmasi Password</label><br>
+      <input type="password" name="password_confirmation" required><br><br>
+
+      <button type="submit">Reset Password</button>
+  </form>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -44,13 +64,18 @@
     }
 
     .form-group input {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      outline: none;
-      font-size: 14px;
-    }
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  margin-bottom: 12px;
+}
+
 
     .form-group input:focus {
       border-color: #f39c12;
@@ -118,5 +143,6 @@
       <button type="submit" class="btn">Reset Password</button>
     </form>
   </div>
+
 </body>
 </html>
