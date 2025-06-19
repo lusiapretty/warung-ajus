@@ -40,7 +40,7 @@
     position: relative;
   }
 
-  .form-group input {
+ .form-group input {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #ccc;
@@ -173,7 +173,7 @@
     setupToggle('toggle-password', 'password');
     setupToggle('toggle-password-confirmation', 'password_confirmation');
 
-    // 🛡 Validasi Password
+    // 🛡 Validasi Password (opsional tapi disarankan)
     const passwordInput = document.getElementById('password');
     const confirmInput = document.getElementById('password_confirmation');
     const form = document.querySelector('form');
@@ -213,6 +213,5 @@
     });
   });
 </script>
-
 </body>
 </html>

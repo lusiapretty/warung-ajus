@@ -123,11 +123,9 @@ body {
   margin-bottom: 1rem;
   margin-top: -15px;
   padding-left: 40px; 
-}
-
-.hero-title .bold {
   font-weight: bold;
 }
+
 
 .hero-title .italic {
   font-style: italic;
@@ -144,6 +142,7 @@ body {
   font-size: 2.5rem;
   margin-bottom: 15px;
   padding-left: 40px; 
+  font-weight: bold;
  
 }
 
@@ -367,6 +366,7 @@ footer {
 }
 
 /*ikon user*/
+/* USER DROPDOWN - DOMINAN MERAH */
 .user-dropdown-wrapper {
   position: relative;
   display: inline-block;
@@ -376,13 +376,13 @@ footer {
   position: absolute;
   right: 0;
   top: 120%;
-  background-color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  width: 240px;
+  width: 260px;
+  background: #fff;
   border-radius: 10px;
-  z-index: 999;
-  padding: 15px;
-  border: 1px solid #dc3545;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  z-index: 1000;
+  border: 1px solid #b30000;
 }
 
 .user-dropdown.hidden {
@@ -390,39 +390,55 @@ footer {
 }
 
 .dropdown-header {
-  border-bottom: 1px solid #eee;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .dropdown-header p {
   margin: 0;
   font-size: 16px;
-  color: #dc3545;
+  color: #b30000;
+  font-weight: bold;
 }
 
 .dropdown-header small {
+  font-size: 13px;
   color: #666;
 }
 
 .dropdown-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 12px 0;
+  margin: 0 0 15px 0;
 }
 
 .dropdown-list li {
-  margin: 8px 0;
+  margin: 10px 0;
 }
 
 .dropdown-list a {
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  color: #dc3545;
+  color: #b30000;
   font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.dropdown-list a:hover {
+  background-color: #ffe6e6;
+  color: #800000;
 }
 
 .dropdown-list a i {
-  margin-right: 6px;
+  margin-right: 10px;
+  font-size: 16px;
+  color: #b30000;
 }
 
 .dropdown-actions {
@@ -431,39 +447,52 @@ footer {
   gap: 10px;
 }
 
-.login-btn, .register-btn {
-  padding: 8px;
-  text-align: center;
-  border-radius: 5px;
+.btn {
+  display: block;
+  width: 100%;
+  padding:6px;
+  border-radius: 25px;
   font-weight: bold;
+  text-align: center;
   text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 14px;
 }
 
 .login-btn {
-  background-color: #dc3545;
-  color: white;
+  background-color: #b30000;
+  color: #fff;
+  border: none;
+}
+
+.login-btn:hover {
+  background-color: #800000;
 }
 
 .register-btn {
-  border: 1px solid #dc3545;
-  color: #dc3545;
-  background-color: white;
+  background-color: #fff;
+  color: #b30000;
+  border: 2px solid #b30000;
+}
+
+.register-btn:hover {
+  background-color: #ffe6e6;
 }
 
 .logout-btn {
-  width: 100%;
-  padding: 10px;
-  background-color: #dc3545;
-  color: white;
+  background-color: #b30000;
+  color: #fff;
   border: none;
-  border-radius: 5px;
-  font-weight: bold;
+  border-radius: 25px;
+  font-size: 14px;
+  padding: 10px;
   cursor: pointer;
+  font-weight: bold;
   transition: background-color 0.2s ease;
 }
 
 .logout-btn:hover {
-  background-color: #c82333;
+  background-color: #800000;
 }
 
 /* 
