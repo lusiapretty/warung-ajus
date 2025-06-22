@@ -14,6 +14,8 @@ class OrderItem extends Model
         'menu_id',
         'jumlah',
         'harga',
+        'catatan',
+        'addons'
     ];
 
     protected $casts = [

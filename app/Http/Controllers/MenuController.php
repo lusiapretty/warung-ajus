@@ -10,8 +10,14 @@ class MenuController extends Controller
 {
     public function index()
     {
-        $menus = Menu::with('addons')->get();
-        return view('menus.makanan', compact('menus'));
+        $menus = Menu::where('kategori', 'makanan')->get();
+        return view('pelanggan.menu-makanan', compact('menus'));    
+    }
+
+    public function indexMinuman()
+    {
+        $menus = Menu::where('kategori', 'minuman')->get();
+        return view('pelanggan.menu-minuman', compact('menus'));
     }
 
     public function create()

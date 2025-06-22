@@ -2,37 +2,63 @@
 
 namespace App\Http\Controllers;
 
+// use Dotenv\Validator;
 use Illuminate\Http\Request;
+use App\Models\Order;
+use App\Models\OrderItem;
+use Illuminate\Support\Facades\Validator;
 
 class CheckoutController extends Controller
 {
     public function checkout(Request $request)
     {
-        $data = $request->validate([
-            'nama'    => 'required|string',
-            'no_meja' => 'required|integer',
-            'cart'    => 'required|array',
-            'cart.*.menu_id' => 'required|string',
-            'cart.*.jumlah'  => 'required|integer|min:1',
-            'cart.*.addons'  => 'nullable|array',
-            'cart.*.catatan'    => 'nullable|string'
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
+            'nama_pelanggan'    => 'required|string',
+            'tipe_pesanan'      => 'required|in:dine_in,take_away',
+            'no_meja'           => 'required_if:tipe_pesanan,dine_in',
+            'pembayaran'        => 'required|string',
+            'menu'              => 'required|array|min:1',
+            'menu.*.menu'       => 'required|string',
+            'menu.*.menu_id'    => 'required|integer|exists:menus,id',
+            'menu.*.basePrice'  => 'required|numeric',
+            'menu.*.quantity'   => 'required|integer|min:1',
+            'menu.*.addons'     => 'nullable|array',
+            'menu.*.catatan'    => 'nullable|string'
         ]);
 
-        $order = \App\Models\Order::create([
-            'nama_pelanggan' => $data['nama'],
-            'no_meja'        => $data['no_meja'],
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Data tidak valid',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        // Simpan Order
+        $order = Order::create([
+            'nama_pelanggan' => $data['nama_pelanggan'],
+            'no_meja'        => $data['tipe_pesanan'] === 'dine_in' ? $data['no_meja'] : null,
+            'tipe_pesanan'   => $data['tipe_pesanan'],
+            'pembayaran'     => $data['pembayaran'],
+            'status'         => 'pending',
         ]);
 
-        foreach ($data['cart'] as $item) {
-            $order->items()->create([
+        // Simpan OrderItem
+        foreach ($data['menu'] as $item) {
+            OrderItem::create([
+                'order_id' => $order->id,
                 'menu_id' => $item['menu_id'],
-                'jumlah'  => $item['jumlah'],
+                'jumlah'  => $item['quantity'],
+                'harga'   => $item['basePrice'], 
                 'addons'  => json_encode($item['addons'] ?? []),
                 'catatan' => $item['catatan'] ?? null,
 
             ]);
         }
 
-        return response()->json(['message' => 'Pesanan berhasil disimpan!']);
+        return response()->json([
+            'message' => 'Pesanan berhasil disimpan!', 
+            'order_id' => $order->id], 201);
     }
 }

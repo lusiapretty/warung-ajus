@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_pelanggan');
-            $table->string('no_meja');
-
-            
-            $table->timestamps();
+        Schema::table('order_items', function (Blueprint $table) {
+            $table->json('addons')->nullable();
+            $table->string('catatan')->nullable();
         });
     }
 
@@ -26,7 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
-        
+        Schema::table('order_items', function (Blueprint $table) {
+            $table->dropColumn(['addons', 'catatan']);
+        });
     }
 };
