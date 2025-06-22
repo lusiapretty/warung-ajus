@@ -108,5 +108,4 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     //PELANGGAN
     Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan.index');
    });
-});
 
