@@ -33,27 +33,35 @@
 <div id="addonOverlay" class="addon-overlay">
   <div class="addon-modal">
     <span class="close-btn" onclick="closeAddonModal()">&times;</span>
-    <img id="modalImage" src="" alt="Makanan" class="modal-image">
-    <h2 id="modalTitle"></h2>
-    <p id="modalPrice" class="modal-price"></p>
-
-    <h3>Pilih Add-on</h3>
-    <div id="addonContent" class="addon-list">
-      <!-- Diisi dari JavaScript -->
+  <div class="modal-body-wrapper">
+    <div class="modal-image-wrapper no-padding">
+      <img id="modalImage" src="" alt="Makanan" class="modal-image">
     </div>
 
-    <label for="catatan">Catatan (opsional):</label>
-    <textarea id="catatan" class="catatan-input" placeholder="Misal: pedas sedikit, tanpa sambal..."></textarea>
+    <div class="modal-content-wrapper">
+      <h3 id="modalTitle"></h3>
+      <p id="modalPrice" class="modal-price"></p>
+      <h6>Pilih Add-on</h6>
+      <div id="addonContent" class="addon-list"></div>
 
-    <div class="quantity-control">
-      <button onclick="updateQty(-1)">-</button>
-      <span id="qtyDisplay">1</span>
-      <button onclick="updateQty(1)">+</button>
+      <label for="catatan">Catatan (opsional):</label>
+      <textarea id="catatan" class="catatan-input" placeholder="Misal: pedas sedikit, tanpa sambal..."></textarea>
+
+      <div class="quantity-control">
+        <i class="fas fa-minus" onclick="updateQty(-1)"></i>
+        <span id="qtyDisplay">1</span>
+        <i class="fas fa-plus" onclick="updateQty(1)"></i>
+      </div>
+
+      <p id="totalPrice" class="modal-total-price"></p>
     </div>
+  </div>
 
-    <p id="totalPrice" class="modal-total-price"></p>
-
-    <button class="add-to-cart-btn" onclick="submitAddon()">Tambah ke Keranjang</button>
+  <div class="modal-footer">
+    <button class="add-to-cart-btn" onclick="submitAddon()">
+      Tambah ke Keranjang - <span id="btnTotalHarga">Rp0</span>
+    </button>
+  </div>
   </div>
 </div>
 @endsection
@@ -111,6 +119,8 @@
 
     calculateTotal();
 
+    document.body.classList.add('modal-open');
+
     document.getElementById('addonOverlay').style.display = 'flex';
     document.body.classList.add('blurred');
   }
@@ -135,9 +145,14 @@
     }, 0);
     const total = (basePrice + addonTotal) * quantity;
     document.getElementById('totalPrice').innerText = `Total: Rp${total.toLocaleString('id-ID')}`;
+
+    // Tampilkan total harga di tombol
+    document.getElementById('btnTotalHarga').innerText = `Rp${total.toLocaleString('id-ID')}`;
   }
 
   function closeAddonModal() {
+    document.body.classList.remove('modal-open');
+
     document.getElementById('addonOverlay').style.display = 'none';
     document.body.classList.remove('blurred');
   }
