@@ -11,14 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_pelanggan');
-            $table->string('no_meja');
-
-            
-            $table->timestamps();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->string('no_meja')->nullable()->change();
         });
+
     }
 
     /**
@@ -26,7 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
-        
+         Schema::table('orders', function (Blueprint $table) {
+            $table->string('no_meja')->nullable(false)->change();
+        });
     }
 };

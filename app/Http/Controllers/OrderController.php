@@ -17,26 +17,33 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        $order = Order::create([
-            'nama_pelanggan' => $request->nama_pelanggan,
-            'no_meja' => $request->no_meja,
-            'status' => 'pending'
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'no_meja' => 'required_if:tipe_pesanan,dine_in',
+            'cart' => 'required|array|min:1'
         ]);
 
-        foreach ($request->menu as $menuData) {
+        $order = Order::create([
+            'nama_pelanggan' => $request->nama,
+            'no_meja' => $request->no_meja,
+            'status' => 'pending',
+        ]);
+
+        foreach ($request->cart as $item) {
             $orderItem = OrderItem::create([
                 'order_id' => $order->id,
-                'menu_id'  => $menuData['id'],
-                'jumlah'   => $menuData['jumlah'],
-                'harga'    => $menuData['harga'],
+                'menu_id'  => $item['menu_id'],
+                'jumlah'   => $item['quantity'],
+                'harga'    => ($item['basePrice'] ?? 0) + collect($item['addons'])->sum('price'),
+                'catatan'  => $item['note'] ?? null,
+                'addons'   => json_encode($item['addons']),
             ]);
-
-            if (isset($menuData['addons'])) {
-                $orderItem->addons()->sync($menuData['addons']);
-            }
         }
 
-        return redirect()->route('order.show', $order->id)->with('success', 'Order Placed successfully');
+        return response()->json([
+            'message' => 'Pesanan berhasil disimpan',
+            'order_id' => $order->id
+        ], 201);
     }
 
     public function show(Order $order)
