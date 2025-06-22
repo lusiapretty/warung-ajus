@@ -31,13 +31,6 @@ Route::get('/menu-minuman', [MenuController::class, 'indexMinuman'])->name('menu
 // Route::post('/checkout', [OrderController::class, 'store'])->name('checkout');
 Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
 
-// Route::get('/menu-makanan', function () {
-//     return view('menu-makanan');
-// })->name('menu-makanan');
-// Route::get('/menu-minuman', function () {
-//     return view('menu-minuman');
-// })->name('menu-minuman');
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/profil', [ProfileController::class, 'edit'])->name('profil.edit');
     Route::post('/profil', [ProfileController::class, 'update'])->name('profil.update');
