@@ -106,7 +106,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/menu/{id}', [AdminController::class, 'show']);
 
     //PELANGGAN
-    Route::middleware(['auth', 'role:admin'])->group(function () {
-      Route::get('/admin/pelanggan', [\App\Http\Controllers\PelangganController::class, 'index'])->name('admin.pelanggan.index');
-});
-});
+    Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan.index');
+   });
+
+
