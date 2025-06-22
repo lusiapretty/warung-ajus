@@ -4,10 +4,12 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
@@ -24,12 +26,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/tentang', [PageController::class, 'tentang'])->name('tentang');
 Route::get('/menu', [PageController::class, 'menu'])->name('menu.pelanggan');
 Route::get('/pesan', [PageController::class, 'pesan']);
-Route::get('/menu-makanan', function () {
-    return view('menu-makanan');
-})->name('menu-makanan');
-Route::get('/menu-minuman', function () {
-    return view('menu-minuman');
-})->name('menu-minuman');
+Route::get('/menu-makanan', [MenuController::class, 'index'])->name('menu.makanan');
+Route::get('/menu-minuman', [MenuController::class, 'indexMinuman'])->name('menu.minuman');
+// Route::post('/checkout', [OrderController::class, 'store'])->name('checkout');
+Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profil', [ProfileController::class, 'edit'])->name('profil.edit');
@@ -108,5 +108,5 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     //PELANGGAN
     Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan.index');
    });
-
+});
 
