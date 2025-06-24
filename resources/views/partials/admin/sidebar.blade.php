@@ -12,7 +12,7 @@
       <ul class="pc-navbar">
 
         <li class="pc-item">
-          <a href="{{ route('admin.dashboard')}}" class="pc-link">
+          <a href="{{ route('dashboard')}}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
             <span class="pc-mtext">Dashboard</span>
           </a>
@@ -31,7 +31,7 @@
           </a>
         </li>
         <li class="pc-item">
-          <a href="#" class="pc-link">
+          <a href="{{ route('admin.orders.index')}}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-tools-kitchen"></i></span>
             <span class="pc-mtext">Pesanan Pelanggan</span>
           </a>

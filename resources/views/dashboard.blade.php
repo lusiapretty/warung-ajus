@@ -46,7 +46,7 @@
     <div class="m-header bg-red-700">
       <a href="#" class="b-brand text-white">
         <!-- ========   Change your logo from here   ============ -->
-      <!-- <img src="img/logo-warung.png" style="max-width: 45%; height: auto;"> -->
+     <img src="{{ asset('img/logo-warung.png')}}" style="max-width: 20%; height: auto;"> 
        <span>WARUNG AJUS</span>
       </a>
     </div>
@@ -73,7 +73,7 @@
           </a>
         </li>
         <li class="pc-item">
-          <a href="#" class="pc-link">
+          <a href="{{ route('admin.orders.index')}}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-tools-kitchen"></i></span>
             <span class="pc-mtext">Pesanan Pelanggan</span>
           </a>
@@ -133,7 +133,7 @@
         data-bs-auto-close="outside"
         aria-expanded="false"
       >
-        <img src="template/dist/assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+        <img src="{{ asset('img/logo-admin.png')}}" alt="user-image" class="user-avtar">
         <span>Admin</span>
       </a>
     </li>

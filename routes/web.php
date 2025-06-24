@@ -94,7 +94,7 @@ Route::middleware(['auth', 'role:pelanggan'])->get('/home', function () {
 
 // ===== Admin Routes =====
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Menu Routes
     Route::get('/admin/menu', [AdminController::class, 'index'])->name('admin.menu.index');
@@ -107,5 +107,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     //PELANGGAN
     Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan.index');
+
+    // Order Routes
+    Route::get('/admin/orders', [OrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/admin/orders/{id}', [OrderController::class, 'show'])->name('admin.orders.show');
+    Route::put('/admin/orders/{id}/update', [OrderController::class, 'update'])->name('admin.orders.update');
+    Route::delete('/admin/orders/{id}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
+    Route::get('/admin/orders/{id}/print', [OrderController::class, 'print'])->name('admin.orders.print');
    });
 

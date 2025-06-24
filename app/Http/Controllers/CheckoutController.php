@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Menu;
 use Illuminate\Support\Facades\Validator;
 
 class CheckoutController extends Controller
@@ -20,7 +21,6 @@ class CheckoutController extends Controller
             'no_meja'           => 'required_if:tipe_pesanan,dine_in',
             'pembayaran'        => 'required|string',
             'menu'              => 'required|array|min:1',
-            'menu.*.menu'       => 'required|string',
             'menu.*.menu_id'    => 'required|integer|exists:menus,id',
             'menu.*.basePrice'  => 'required|numeric',
             'menu.*.quantity'   => 'required|integer|min:1',
@@ -46,9 +46,19 @@ class CheckoutController extends Controller
 
         // Simpan OrderItem
         foreach ($data['menu'] as $item) {
+            $menu = Menu::find($item['menu_id']);
+
+            if (!$menu) {
+                return response()->json([
+                    'message' => 'Menu tidak ditemukan',
+                    'errors' => ['menu_id' => 'Menu ID ' . $item['menu_id'] . ' tidak ditemukan']
+                ], 422);
+            }
+
             OrderItem::create([
                 'order_id' => $order->id,
                 'menu_id' => $item['menu_id'],
+                'nama_menu' => $menu ? $menu->nama_menu : 'Menu Tidak Ditemukan',
                 'jumlah'  => $item['quantity'],
                 'harga'   => $item['basePrice'], 
                 'addons'  => json_encode($item['addons'] ?? []),
