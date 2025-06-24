@@ -325,7 +325,6 @@ const baseAssetUrl = "{{ asset('img') }}/";
       no_meja: tipe_pesanan === 'dine_in' ? no_meja : null,
       pembayaran: metode_pembayaran,
       menu: cart.map(item => ({
-        menu: item.menu,
         menu_id: item.menu_id,
         basePrice: item.basePrice,
         quantity: item.quantity,

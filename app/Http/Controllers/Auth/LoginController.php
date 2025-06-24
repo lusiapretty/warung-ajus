@@ -46,7 +46,7 @@ class LoginController extends Controller
             Log::info('Login success: user role = ' . $user->role);
 
             if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
+                return redirect()->route('dashboard');
             } elseif ($user->role === 'pelanggan') {
                 return redirect()->route('home');
             } else {
