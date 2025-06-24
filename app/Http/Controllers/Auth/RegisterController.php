@@ -18,31 +18,29 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
       $request->validate([
-    'name'     => 'required|string|max:255',
+    'nama'     => 'required|string|max:255',
     'email'    => 'required|string|email|max:255|unique:users',
     'password' => [
-        'required',
-        'string',
-        'min:6',
-        'regex:/[A-Z]/',
-        'confirmed'
+    'required',
+    'string',
+    'min:6',
+    'confirmed'
     ],
+
 ], [
-    'password.min' => 'Password minimal 6 karakter.',
-    'password.regex' => 'Password harus mengandung minimal 1 huruf besar.',
     'password.confirmed' => 'Ulangi kata sandi tidak cocok.',
 ]);
 
 
         $user = User::create([
-            'nama'     => $request->name,
+            'nama'     => $request->nama,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role'     => 'pelanggan', // role default
+            'role'     => 'pelanggan', 
         ]);
 
         Auth::login($user); // login otomatis setelah registrasi
 
-        return redirect()->route('home'); // redirect ke halaman home
+        return redirect()->route('home')->with('success', 'Berhasil Terdaftar. Selamat datang, ' . $user->nama . '!');
     }
 }

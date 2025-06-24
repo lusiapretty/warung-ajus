@@ -48,13 +48,14 @@ class LoginController extends Controller
             if ($user->role === 'admin') {
                 return redirect()->route('dashboard');
             } elseif ($user->role === 'pelanggan') {
-                return redirect()->route('home');
+                return redirect()->route('home')->with('success', 'Login berhasil. Selamat datang, ' . $user->nama . '!');
             } else {
                 Auth::logout();
                 return redirect()->route('login')->withErrors([
                     'email' => 'Role tidak dikenali.'
                 ]);
-            }
+}
+
         }
 
         Log::warning('Login failed for email: ' . $request->email);
