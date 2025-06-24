@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ class AdminController extends Controller
         return view('dashboard');
     }
 
+      
     public function index(Request $request)
     {
         if ($request->ajax()) {

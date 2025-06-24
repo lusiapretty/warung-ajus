@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <title>Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Font Awesome untuk ikon mata -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+  
+  <!-- Font Awesome (untuk ikon mata) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
   <style>
     body {
       margin: 0;
@@ -39,19 +41,18 @@
       position: relative;
     }
 
-
     .form-group input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    outline: none;
-    box-sizing: border-box;
-    font-size: 14px;
-    font-family: 'Poppins', sans-serif;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    margin-bottom: 12px;
-  }
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      box-sizing: border-box;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      margin-bottom: 12px;
+    }
 
     .form-group input:focus {
       border-color: #f39c12;
@@ -114,6 +115,15 @@
       transform: translateY(-50%);
       cursor: pointer;
       color: #999;
+      width: 36px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .eye-icon:hover {
+      color: #333;
     }
   </style>
 </head>
@@ -163,15 +173,12 @@
       const eyeIcon = document.getElementById('eye-icon');
 
       togglePassword.addEventListener('click', () => {
-        if (passwordInput.type === 'password') {
-          passwordInput.type = 'text';
-          eyeIcon.classList.remove('fa-eye');
-          eyeIcon.classList.add('fa-eye-slash');
-        } else {
-          passwordInput.type = 'password';
-          eyeIcon.classList.remove('fa-eye-slash');
-          eyeIcon.classList.add('fa-eye');
-        }
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        eyeIcon.classList.replace(
+          isPassword ? 'fa-eye' : 'fa-eye-slash',
+          isPassword ? 'fa-eye-slash' : 'fa-eye'
+        );
       });
     });
   </script>

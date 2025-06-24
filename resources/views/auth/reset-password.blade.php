@@ -3,27 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Reset Password</title>
-</head>
-<body>
-  <h2>Reset Kata Sandi</h2>
-
-  <form method="POST" action="{{ route('password.update') }}">
-      @csrf
-
-      <input type="hidden" name="token" value="{{ $token }}">
-      <label>Email</label><br>
-      <input type="email" name="email" required><br><br>
-
-      <label>Password Baru</label><br>
-      <input type="password" name="password" required><br><br>
-
-      <label>Konfirmasi Password</label><br>
-      <input type="password" name="password_confirmation" required><br><br>
-
-      <button type="submit">Reset Password</button>
-  </form>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
     body {
       margin: 0;
@@ -57,28 +39,33 @@
       position: relative;
     }
 
-    .form-group label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
-
     .form-group input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  outline: none;
-  box-sizing: border-box;
-  font-size: 14px;
-  font-family: 'Poppins', sans-serif;
-  transition: border-color 0.3s, box-shadow 0.3s;
-  margin-bottom: 12px;
-}
-
+      width: 100%;
+      padding: 10px 38px 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
 
     .form-group input:focus {
       border-color: #f39c12;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #aaa;
+    }
+
+    .info-text {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 6px;
     }
 
     .btn {
@@ -104,6 +91,12 @@
       margin-bottom: 15px;
       font-size: 14px;
     }
+
+    .error-message {
+      color: red;
+      font-size: 12px;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -122,27 +115,52 @@
 
     <form method="POST" action="{{ route('password.update') }}">
       @csrf
-
       <input type="hidden" name="token" value="{{ $token }}">
 
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" name="email" value="{{ old('email') }}" required>
+        <input type="email" name="email" placeholder="Masukkan Email Anda" value="{{ old('email') }}" required>
       </div>
 
       <div class="form-group">
-        <label>Password Baru</label>
-        <input type="password" name="password" required>
+        <div class="info-text">Password minimal 6 karakter dan 1 huruf besar.</div>
+        <input type="password" name="password" id="password" placeholder="Password Baru" required>
+        <span class="toggle-password" id="toggle-password">
+          <i class="fas fa-eye"></i>
+        </span>
       </div>
 
       <div class="form-group">
-        <label>Konfirmasi Password</label>
-        <input type="password" name="password_confirmation" required>
+        <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Konfirmasi Password" required>
+        <span class="toggle-password" id="toggle-password-confirmation">
+          <i class="fas fa-eye"></i>
+        </span>
       </div>
 
       <button type="submit" class="btn">Reset Password</button>
     </form>
   </div>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      function setupToggle(toggleId, inputId) {
+        const toggle = document.getElementById(toggleId);
+        const input = document.getElementById(inputId);
+        const icon = toggle.querySelector('i');
+
+        toggle.addEventListener('click', () => {
+          if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+          } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+          }
+        });
+      }
+
+      setupToggle('toggle-password', 'password');
+      setupToggle('toggle-password-confirmation', 'password_confirmation');
+    });
+  </script>
 </body>
 </html>

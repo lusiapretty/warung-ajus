@@ -4,6 +4,22 @@
 @section('title', 'Beranda - Warung Ajus')
 
 @section('content')
+@if (session('success'))
+  <div id="alert-success" style="background-color: #d4edda; color: #155724; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; text-align: center;">
+    {{ session('success') }}
+  </div>
+
+  <script>
+    setTimeout(function () {
+      const alertBox = document.getElementById('alert-success');
+      if (alertBox) {
+        alertBox.style.transition = 'opacity 0.5s ease-out';
+        alertBox.style.opacity = '0';
+        setTimeout(() => alertBox.remove(), 500);
+      }
+    }, 1000);
+  </script>
+@endif
 
 <!-- Hero Section -->
 <section class="hero">
@@ -80,4 +96,5 @@
 <script>
   AOS.init();
 </script>
+
 @endsection
