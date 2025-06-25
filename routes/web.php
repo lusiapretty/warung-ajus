@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddonController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MenuController;
@@ -26,7 +27,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/tentang', [PageController::class, 'tentang'])->name('tentang');
 Route::get('/menu', [PageController::class, 'menu'])->name('menu.pelanggan');
 Route::get('/pesan', [PageController::class, 'pesan']);
-Route::get('/menu-makanan', [MenuController::class, 'index'])->name('menu.makanan');
+Route::get('/menu-makanan', [MenuController::class, 'indexMakanan'])->name('menu.makanan');
 Route::get('/menu-minuman', [MenuController::class, 'indexMinuman'])->name('menu.minuman');
 // Route::post('/checkout', [OrderController::class, 'store'])->name('checkout');
 Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
@@ -97,13 +98,21 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Menu Routes
-    Route::get('/admin/menu', [AdminController::class, 'index'])->name('admin.menu.index');
-    Route::get('/menu/create', [AdminController::class, 'create'])->name('admin.menu.create');
-    Route::post('/admin/menu/store', [AdminController::class, 'store'])->name('admin.menu.store');
-    Route::get('/admin/menu/{id}/edit', [AdminController::class, 'edit'])->name('admin.menu.edit');
-    Route::put('/admin/menu/update/{id}', [AdminController::class, 'update'])->name('admin.menu.update');
-    Route::delete('/admin/menu/{id}', [AdminController::class, 'destroy'])->name('admin.menu.destroy');
-    Route::get('/admin/menu/{id}', [AdminController::class, 'show']);
+    Route::get('/admin/menu', [MenuController::class, 'index'])->name('admin.menu.index');
+    Route::get('/menu/create', [MenuController::class, 'create'])->name('admin.menu.create');
+    Route::post('/admin/menu/store', [MenuController::class, 'store'])->name('admin.menu.store');
+    Route::get('/admin/menu/{id}/edit', [MenuController::class, 'edit'])->name('admin.menu.edit');
+    Route::put('/admin/menu/update/{id}', [MenuController::class, 'update'])->name('admin.menu.update');
+    Route::delete('/admin/menu/{id}', [MenuController::class, 'destroy'])->name('admin.menu.destroy');
+    Route::get('/admin/menu/{id}', [MenuController::class, 'show']);
+
+    // Addon Routes
+    Route::get('/admin/addons', [AddonController::class, 'index'])->name('admin.addons.index');  
+    Route::post('/admin/addons/store', [AddonController::class, 'store'])->name('admin.addons.store');
+    Route::get('/admin/addons/{id}/edit', [AddonController::class, 'edit'])->name('admin.addons.edit');
+    Route::put('/admin/addons/update/{id}', [AddonController::class, 'update'])->name('admin.addons.update');
+    Route::delete('/admin/addons/{id}', [AddonController::class, 'destroy'])->name('admin.addons.destroy');
+
 
     //PELANGGAN
     Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan.index');

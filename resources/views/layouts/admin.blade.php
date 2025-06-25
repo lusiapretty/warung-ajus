@@ -39,6 +39,7 @@
   <!-- [Page Specific JS] start -->
   <script src="{{ asset('template/dist/assets/js/plugins/apexcharts.min.js') }}"></script>
   <script src="{{ asset('template/dist/assets/js/pages/dashboard-default.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- [Page Specific JS] end -->
   <!-- Required Js -->
   <script src="{{ asset('template/dist/assets/js/plugins/popper.min.js') }}"></script>

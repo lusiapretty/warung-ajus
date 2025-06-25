@@ -76,18 +76,6 @@
   const menuDataById = @json($menus->keyBy('id'));
   const menuDataByName = @json($menus->keyBy('nama_menu')); 
 
-  const addonData = {
-    "Nasi Campur": [
-      { name: "Telur Rebus", price: 3000 },
-      { name: "Ayam Suwir", price: 5000 },
-      { name: "Sambal Matah", price: 2000 }
-    ],
-    "Soto Ayam": [
-      { name: "Telur", price: 3000 },
-      { name: "Kerupuk", price: 1000 }
-    ],
-  };
-
   let currentMenu = null;
   let currentMenuId = null;
   let quantity = 1;
@@ -98,18 +86,20 @@
     quantity = 1;
     document.getElementById('qtyDisplay').innerText = quantity;
 
+    const menuData = menuDataById[menuId];
     const basePrice = baseMenuPrices[menuName] || 0;
+    const addons = menuData.addons || [];
+
     document.getElementById('modalPrice').innerText = `Harga: Rp${basePrice.toLocaleString('id-ID')}`;
 
-    const addons = addonData[menuName] || [];
     const addonContent = document.getElementById('addonContent');
     addonContent.innerHTML = '';
 
     addons.forEach((addon) => {
       addonContent.innerHTML += `
         <label>
-          <span>${addon.name} - Rp${addon.price.toLocaleString()}</span>
-          <input type="checkbox" name="addon" value="${addon.name}" data-price="${addon.price}" onchange="calculateTotal()">
+          <span>${addon.nama} - Rp${addon.harga.toLocaleString()}</span>
+          <input type="checkbox" name="addon" value="${addon.nama}" data-price="${addon.harga}" onchange="calculateTotal()">
         </label>
       `;
     });
