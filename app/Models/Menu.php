@@ -21,7 +21,7 @@ class Menu extends Model
 
     public function addons()
     {
-        return $this->belongsToMany(Addon::class);
+        return $this->belongsToMany(Addon::class, 'menu_addon', 'menu_id', 'addon_id');
     }
 
     public function orderItems()

@@ -18,6 +18,7 @@
                             <tr>
                                 <th>No</th>
                                 <th>Nama Menu</th>
+                                <th>Add-ons</th>
                                 <th>Deskripsi</th>
                                 <th>Harga</th>
                                 <th>Kategori</th>
@@ -49,6 +50,21 @@
                             <div class="form-group">
                                 <label for="nama-menu">Nama Menu</label>
                                 <input type="text" class="form-control" name="nama_menu" id="nama_menu" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="addons">Add-ons (opsional)</label>
+                                <div class="row">
+                                    @foreach($addons as $addon)
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="addons[]" value="{{ $addon->id }}" id="addon_{{ $addon->id }}">
+                                                <label class="form-check-label" for="addon_{{ $addon->id }}">
+                                                    {{ $addon->nama }} (+Rp{{ number_format($addon->harga, 0, ',', '.') }})
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="deskripsi">Deskripsi</label>
@@ -107,6 +123,12 @@ $(document).ready(function () {
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'nama_menu', name: 'nama_menu' },
+            { 
+                data: 'addons', 
+                name: 'addons', 
+                orderable: false, 
+                searchable: false, 
+            },
             { data: 'deskripsi', name: 'deskripsi' },
             { data: 'harga', name: 'harga' },
             { data: 'kategori', name: 'kategori' },
@@ -123,7 +145,6 @@ $(document).ready(function () {
 
 
         var form = $(this);
-        // var formElement = $('#create-menu-form')[0];
         var formData = new FormData(this);
         var actionUrl = form.attr('action');
         var method = form.find('input[name="_method"]').val() || 'POST';
@@ -160,8 +181,6 @@ $(document).ready(function () {
                     }, 300);
 
                     // Reset form dan reload data
-                    // $('body').removeClass('modal-open');
-                    // $('.modal-backdrop').remove();
                     $('#create-menu-form')[0].reset();
                     $('#create-menu-form input[name="_method"]').remove();
                     $('#menu-table').DataTable().ajax.reload();
@@ -211,14 +230,23 @@ $(document).ready(function () {
             console.log("Data dari server untuk edit:", data);
 
             $('#createMenuModal').modal('show');
-            $('#createMenuModalLabel').text('Edit Menu');
-            $('#create-menu-form').attr('action', updateUrl); // ganti action form ke update/{id}
 
             // Isi field form dari data
             $('#nama_menu').val(data.nama_menu);
+            // $('addons[]').prop('checked', false); // Uncheck semua checkbox addons
             $('#deskripsi').val(data.deskripsi);
             $('#harga').val(data.harga);
             $('#kategori').val(data.kategori);
+
+            // Centang checkbox addon yang dipilih
+            $('input[name="addons[]"]').each(function() {
+                const id = parseInt($(this).val());
+                $(this).prop('checked', data.addons.includes(id));
+            });
+
+            $('#createMenuModalLabel').text('Edit Menu');
+            $('#create-menu-form').attr('action', updateUrl); // ganti action form ke update/{id}
+
 
             // Tambahkan _method PUT jika belum ada
             if ($('#create-menu-form input[name="_method"]').length === 0) {
@@ -226,9 +254,7 @@ $(document).ready(function () {
             }
         });
     });
-
-
-        
+    
     
     // Delete Menu
     $(document).on('click', '.btn-delete', function() {
@@ -265,9 +291,26 @@ $(document).ready(function () {
             $('#create-menu-form input[name="_method"]').remove(); // hapus input method PUT kalau ada
         }
     });
- 
-
 });
 
 </script>
+
+<script>
+    // Mencegah error classList pada elemen null
+    window.addEventListener('DOMContentLoaded', () => {
+        try {
+            var el = document.getElementById('box-container');
+            if (el && el.classList) {
+                el.classList.add('safe');
+            }
+        } catch(e) {
+            console.warn("Safe fallback: box-container tidak ditemukan");
+        }
+    });
+</script>
+
+{{-- Tambahkan sebelum @endsection --}}
+<div class="pc-content" style="display:none;"></div>
+<div class="footer-wrapper" style="display:none;"></div>
+
 @endsection
