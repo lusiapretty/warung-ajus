@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Menu;
-use App\Models\Addon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -15,5 +13,5 @@ class AdminController extends Controller
     {
         return view('dashboard');
     }
-    
+
 }

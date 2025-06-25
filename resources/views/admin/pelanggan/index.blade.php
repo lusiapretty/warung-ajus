@@ -2,7 +2,8 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4">Daftar Pelanggan yang Pernah Login</h2>
+   <h2 class="mb-4">Daftar Semua Pelanggan</h2>
+
 
     <div class="table-responsive">
         <table id="tabelPelanggan" class="table table-bordered table-striped">
@@ -12,6 +13,7 @@
                     <th>Nama</th>
                     <th>Email</th>
                     <th>Terakhir Login</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -20,11 +22,21 @@
                         <td>{{ $user->id }}</td>
                         <td>{{ $user->nama }}</td>
                         <td>{{ $user->email }}</td>
-                        <td>{{ $user->last_login_at }}</td>
+                        <td>
+                            {{ $user->last_login_at ? \Carbon\Carbon::parse($user->last_login_at)->translatedFormat('d M Y H:i') : '-' }}
+                        </td>
+                        <td>
+                            @if ($user->last_login_at)
+                                <span class="badge bg-success">Sudah Login</span>
+                            @else
+                                <span class="badge bg-warning text-dark">Baru Daftar</span>
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center">Belum ada pelanggan yang login.</td>
+                        <td colspan="5" class="text-center">Belum ada pelanggan yang terdaftar.</td>
+
                     </tr>
                 @endforelse
             </tbody>
