@@ -78,7 +78,7 @@
 <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
-      <div class="modal-header bg-success text-white">
+      <div class="modal-header bg-warning text-white">
         <h5 class="modal-title fw-bold" id="checkoutModalLabel">🧾Konfirmasi Pesanan</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
       </div>
@@ -106,24 +106,19 @@
           <h5 class="fw-bold mt-4">Detail Pesanan:</h5>
           <div id="checkoutSummary" class="checkout-summary"></div>
 
-          <div class="mb-3">
-            <label for="metode-pembayaran" class="form-label">Metode Pembayaran</label>
-            <select id="metode_pembayaran" class="form-select">
-              <option value="tunai">Tunai</option>
-              <option value="qris">QRIS</option>
-              <option value="transfer">Transfer Bank</option>
-            </select>
-          </div>
         </form>    
       </div>
       <div class="modal-footer justify-content-between">
         <h5 id="checkoutTotal">Total: Rp0</h5>
-        <button type="submit" form="checkoutForm" class="btn btn-lg btn-success px-4 fw-bold">Buat Pesanan</button>
+        <button type="submit" form="checkoutForm" class="btn btn-lg btn-warning px-4 fw-bold">Buat Pesanan</button>
       </div>
     </div>
   </div>
 </div>
 
+
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 const baseAssetUrl = "{{ asset('img') }}/";
@@ -158,16 +153,20 @@ const baseAssetUrl = "{{ asset('img') }}/";
             </div>
             <div class="col-md-9">
               <div class="card-body">
-                <h5 class="card-title">${item.menu}</h5>
-                <p class="card-text">Catatan: ${item.note || '-'}</p>
-                <ul>${addonList || '<li>Tidak ada add-on</li>'}</ul>
-                <p><strong>Total: Rp${totalPerItem.toLocaleString('id-ID')}</strong></p>
-                <div class="d-flex align-items-center gap-2 mb-2">
-                  <button class="btn btn-sm btn-secondary" onclick="changeQty(${index}, -1)">-</button>
-                  <span class="fw-bold">${item.quantity}</span>
-                  <button class="btn btn-sm btn-secondary" onclick="changeQty(${index}, 1)">+</button>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="card-title"><strong>${item.menu}</strong></h6>
+                  <p>${totalPerItem.toLocaleString('id-ID')}</p>
                 </div>
-                <button class="btn btn-danger btn-sm" onclick="removeItem(${index})">Hapus</button>
+                <ul>${addonList || ''}</ul>
+                <p class="card-text">Catatan: ${item.note || '-'}</p>
+                <div class="mb-2">
+                  <button class="btn btn-warning btn-sm btn-edit-menu" onclick="editItem(${index})">Edit</button>
+                </div>
+                <div class="quantity-control-cart">
+                  <i class="fas fa-minus" onclick="changeQty(${index}, -1)"></i>
+                  <span class="fw-bold">${item.quantity}</span>
+                  <i class="fas fa-plus" onclick="changeQty(${index}, +1)"></i>
+                </div>
               </div>
             </div>
           </div>
@@ -190,6 +189,36 @@ const baseAssetUrl = "{{ asset('img') }}/";
   function changeQty(index, delta) {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     if (!cart[index]) return;
+
+    const currentQty = cart[index].quantity;
+
+    // Jika quantity == 1 dan dikurangi
+    if (delta === -1 && currentQty === 1) {
+      Swal.fire({
+        title: 'Hapus item ini?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          cart.splice(index, 1);
+          localStorage.setItem('cart', JSON.stringify(cart));
+          loadCart();
+          updateCartCount();
+          Swal.fire({
+            title: 'Dihapus!',
+            text: 'Item berhasil dihapus dari keranjang.',
+            icon: 'success',
+            timer: 1000,
+            showConfirmButton: false
+          });
+        }
+      });
+      return;
+    }
 
     cart[index].quantity += delta;
     if (cart[index].quantity < 1) cart[index].quantity = 1;
@@ -228,7 +257,7 @@ const baseAssetUrl = "{{ asset('img') }}/";
                 <h5 class="card-title">${item.menu}</h5>
                 <p class="card-text">Jumlah: ${item.quantity}</p>
                 <p class="card-text">Catatan: ${item.note || '-'}</p>
-                <ul>${addonList || '<li>Tidak ada add-on</li>'}</ul>
+                <ul>${addonList || ''}</ul>
                 <p><strong>Total: Rp${total.toLocaleString('id-ID')}</strong></p>
               </div>
             </div>
@@ -275,10 +304,12 @@ const baseAssetUrl = "{{ asset('img') }}/";
             </div>
             <div class="col-md-9">
               <div class="card-body">
-                <h5 class="card-title">${item.menu}</h5>
-                <p class="card-text">Jumlah: ${item.quantity}</p>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="card-title"><strong>${item.menu}</strong></h6>
+                  <p class="card-text">x ${item.quantity}</p>
+                </div>
                 <p class="card-text">Catatan: ${item.note || '-'}</p>
-                <ul>${addonList || '<li>Tidak ada add-on</li>'}</ul>
+                <ul>${addonList || ''}</ul>
                 <p><strong>Total: Rp${total.toLocaleString('id-ID')}</strong></p>
               </div>
             </div>
@@ -310,20 +341,25 @@ const baseAssetUrl = "{{ asset('img') }}/";
       const tipe_pesanan = document.getElementById('tipe_pesanan').value;
       const nama = document.getElementById('nama_pelanggan').value;
       const no_meja = document.getElementById('no_meja').value;
-      const metode_pembayaran = document.getElementById('metode_pembayaran').value;
 
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-      if (!tipe_pesanan || !nama || !metode_pembayaran || (tipe_pesanan === 'dine_in' && !no_meja)) {
+      if (!tipe_pesanan || !nama || (tipe_pesanan === 'dine_in' && !no_meja)) {
         alert("Mohon lengkapi semua data pelanggan.");
         return;
-    }
+      }
+
+      let grandTotal = 0;
+      cart.forEach(item => {
+        const basePrice = Number(item.basePrice || 0);
+        const addonTotal = item.addons.reduce((sum, a) => sum + Number(a.price || 0), 0);
+        grandTotal += (basePrice + addonTotal) * (item.quantity || 1);
+      });
 
     const payload = {
       nama_pelanggan: nama,
       tipe_pesanan,
       no_meja: tipe_pesanan === 'dine_in' ? no_meja : null,
-      pembayaran: metode_pembayaran,
       menu: cart.map(item => ({
         menu_id: item.menu_id,
         basePrice: item.basePrice,
@@ -337,8 +373,8 @@ const baseAssetUrl = "{{ asset('img') }}/";
 
     // console.log('Cart:', cart);
 
-    // AJAX pakai fetch
-    fetch('/checkout', {
+    // Panggil endpoint untuk ambil snap token Midtrans
+    fetch('/midtrans/token', {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
@@ -346,43 +382,56 @@ const baseAssetUrl = "{{ asset('img') }}/";
       },
       body: JSON.stringify(payload)
     })
-    .then(response => {
-      if (!response.ok) {
-        return response.text().then(text => {
-          // console.error("Response dari server:", text);
-          throw new Error('Response bukan JSON yang valid');
-
-          localStorage.removeItem("cart");
-          loadCart();
-      });
-    }
-      return response.json(); 
-    })
-
+    .then(response => response.json())
     .then(data => {
-      // console.log("Response berhasil:", data);
-      if (data.message) {
-        alert(data.message);
-      localStorage.removeItem('cart');
-      loadCart();
-      updateCartCount();
-      document.getElementById('checkoutForm').reset();
+      if (data.snap_token) {
+        snap.pay(data.snap_token, {
+            onSuccess: function(result) {
+            // Setelah pembayaran berhasil, simpan order
+            const simpanPayload = {
+              nama_pelanggan: nama,
+              tipe_pesanan,
+              no_meja: tipe_pesanan === 'dine_in' ? no_meja : null,
+              total: grandTotal,
+              menu: cart
+            };
 
-      // Hapus isi keranjang
-      const cartContainer = document.getElementById('cartContainer');
-      // document.getElementById('cartContainer').innerHTML = '0';
+            fetch('/simpan-order', {
+              method: 'POST',
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              },
+              body: JSON.stringify(simpanPayload)
+            })
+            .then(res => res.json())
+            .then(data => {
+              localStorage.removeItem('cart');
+              updateCartCount();
+              loadCart();
+              window.location.href = '/';
+            })
+            .catch(err => {
+              console.error(err);
+              alert("Pesanan berhasil dibayar, tapi gagal disimpan. Hubungi admin.");
+            });
+          },
 
-      const modalElement = document.getElementById('checkoutModal');
-      const modalInstance = bootstrap.Modal.getInstance(modalElement);
-      // const modal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
-      if(modalInstance) {
-        modalInstance.hide();
+          onPending: function(result) {
+            alert("Transaksi belum selesai. Silahkan selesaikan pembayaran.");
+          },
+          onError: function(result) {
+            alert("Gagal melakukan pembayaran. Silahkan coba lagi.");
+          },
+          onClose: function() {
+            alert("Kamu menutup popup tanpa menyelesaikan pembayaran.");
+          }
+        });
       } else {
-        const fallbackmodal = new bootstrap.Modal(modalElement);
-        fallbackmodal.hide();
+        alert("Gagal mengambil token. Silahkan coba lagi.");
       }
-      } 
     })
+
     .catch(error => {
       // console.error('Error:', error);
       alert("Terjadi kesalahan saat mengirim pesanan.");
@@ -428,4 +477,24 @@ const baseAssetUrl = "{{ asset('img') }}/";
     loadCart();
     updateCartCount();
   });
+
+
+  // Fungsi editItem 
+  function editItem(index) {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartitem = cart[index];
+
+    if (!cartItem) {
+      alert("Item tidak ditemukan!");
+      return;
+    }
+
+    // 🚨 Tambahkan ini sebelum buka modal baru
+    const cartModal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
+    if (cartModal) {
+      cartModal.hide();
+    }
+
+    openAddonModal(cartItem.menu, item.menu_id, item, index);
+  }
 </script>

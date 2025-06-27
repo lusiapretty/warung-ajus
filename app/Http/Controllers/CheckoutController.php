@@ -71,4 +71,44 @@ class CheckoutController extends Controller
             'message' => 'Pesanan berhasil disimpan!', 
             'order_id' => $order->id], 201);
     }
+
+    public function storeFromMidtrans(Request $request)
+    {
+        $data = $request->all();
+
+        $order = Order::create([
+            'user_id'        => auth()->check() ? auth()->id() : null,
+            'nama_pelanggan' => $data['nama_pelanggan'],
+            'tipe_pesanan'   => $data['tipe_pesanan'],
+            'no_meja'        => $data['no_meja'],
+            'pembayaran'     => $data['pembayaran'],
+            'status'         => 'paid',
+            'total'          => $data['total'],
+        ]);
+
+        foreach ($data['menu'] as $item) {
+            OrderItem::create([
+                'order_id'  => $order->id,
+                'menu_id'   => $item['menu_id'],
+                'nama_menu' => Menu::find($item['menu_id'])->nama_menu ?? 'Tidak diketahui',
+                'jumlah'    => $item['quantity'],
+                'harga'     => $item['basePrice'],
+                'catatan'   => $item['catatan'],
+                'addons'    => json_encode($item['addons'] ?? []),
+            ]);
+
+            if (!empty($item['addons'])) {
+                foreach ($item['addons'] as $addon) {
+                    $order->addons()->create([
+                        'addon_id' => $addon['id'],
+                        'order_id' => $order->id,
+                        'harga' => $addon['price'],
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['message' => 'Order berhasil disimpan']);
+    }
+
 }

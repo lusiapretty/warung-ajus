@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
@@ -31,6 +32,8 @@ Route::get('/menu-makanan', [MenuController::class, 'indexMakanan'])->name('menu
 Route::get('/menu-minuman', [MenuController::class, 'indexMinuman'])->name('menu.minuman');
 // Route::post('/checkout', [OrderController::class, 'store'])->name('checkout');
 Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
+Route::post('/simpan-order', [CheckoutController::class, 'storeFromMidtrans'])->name('order.storeFormMidtrans');
+Route::post('/midtrans/token', [PaymentController::class, 'createSnapToken'])->name('midtrans.token');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profil', [ProfileController::class, 'edit'])->name('profil.edit');

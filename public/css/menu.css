@@ -216,10 +216,8 @@
     }
 
     .modal-price {
-      font-size: 1.2rem;
-      color: green;
-      font-weight: bold;
-      margin-bottom: 15px;
+      font-size: 0.8 rem;
+      color: black;
     }
 
     .menu-contents li {
@@ -360,3 +358,40 @@
     }
 
 
+    .quantity-control-cart {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+      margin: 15px 0;
+    }
+
+    .quantity-control-cart i {
+      width: 32px;
+      height: 32px;
+      padding: 0px 10px;
+      background-color: #B80000;
+      border-radius: 50%;
+      border: none;
+      font-size: 14px;
+      font-weight: bold;
+      color: #ffffff;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.2s;
+    }
+
+    .quantity-control-cart span {
+      font-size: 16px;
+      font-weight: bold;
+      width: 30px;
+      text-align: center;
+    }
+
+   .btn-edit-menu {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    text-align: center;
+   }
