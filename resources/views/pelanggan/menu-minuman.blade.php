@@ -40,8 +40,10 @@
     </div>
 
     <div class="modal-content-wrapper">
-      <h3 id="modalTitle"></h3>
-      <p id="modalPrice" class="modal-price"></p>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 id="modalTitle"></h4>
+        <p id="modalPrice" class="modal-price"></p>
+      </div>
       <h6>Pilih Add-on</h6>
       <div id="addonContent" class="addon-list"></div>
 
@@ -54,7 +56,7 @@
         <i class="fas fa-plus" onclick="updateQty(1)"></i>
       </div>
 
-      <p id="totalPrice" class="modal-total-price"></p>
+      {{-- <p id="totalPrice" class="modal-total-price"></p> --}}
     </div>
   </div>
 
@@ -70,6 +72,7 @@
 @push('scripts')
 <!-- Load jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
   const baseMenuPrices = @json($menus->pluck('harga', 'nama_menu'));
@@ -77,40 +80,32 @@
   const menuDataById = @json($menus->keyBy('id'));
   const menuDataByName = @json($menus->keyBy('nama_menu')); 
 
-  const addonData = {
-    "Nasi Campur": [
-      { name: "Telur Rebus", price: 3000 },
-      { name: "Ayam Suwir", price: 5000 },
-      { name: "Sambal Matah", price: 2000 }
-    ],
-    "Soto Ayam": [
-      { name: "Telur", price: 3000 },
-      { name: "Kerupuk", price: 1000 }
-    ],
-  };
-
   let currentMenu = null;
   let currentMenuId = null;
   let quantity = 1;
+  let editingIndex = null;
 
-  function openAddonModal(menuName, menuId) {
+  function openAddonModal(menuName, menuId, itemData = null, index = null) {
     currentMenu = menuName;
     currentMenuId = menuId;
     quantity = 1;
     document.getElementById('qtyDisplay').innerText = quantity;
+    editingIndex = index !== null ? index : null;
 
+    const menuData = menuDataById[menuId];
     const basePrice = baseMenuPrices[menuName] || 0;
-    document.getElementById('modalPrice').innerText = `Harga: Rp${basePrice.toLocaleString('id-ID')}`;
+    const addons = menuData.addons || [];
 
-    const addons = addonData[menuName] || [];
+    document.getElementById('modalPrice').innerText = `${basePrice.toLocaleString('id-ID')}`;
+
     const addonContent = document.getElementById('addonContent');
     addonContent.innerHTML = '';
 
     addons.forEach((addon) => {
       addonContent.innerHTML += `
         <label>
-          <span>${addon.name} - Rp${addon.price.toLocaleString()}</span>
-          <input type="checkbox" name="addon" value="${addon.name}" data-price="${addon.price}" onchange="calculateTotal()">
+          <span>${addon.nama} - Rp${addon.harga.toLocaleString()}</span>
+          <input type="checkbox" name="addon" value="${addon.nama}" data-price="${addon.harga}" onchange="calculateTotal()">
         </label>
       `;
     });
@@ -118,7 +113,36 @@
     document.getElementById('modalImage').src = getImageUrl(menuName);
     document.getElementById('modalTitle').innerText = menuName;
 
+  // Jika sedang edit
+  if (itemData) {
+  quantity = itemData.quantity || 1;
+  document.getElementById('qtyDisplay').innerText = quantity;
+
+  setTimeout(() => {
+  const catatanInput = document.getElementById('catatan');
+  if (catatanInput && itemData.note) {
+    catatanInput.value = itemData.note;
+  }
+
+  const addonCheckboxes = document.querySelectorAll('input[name="addon"]');
+  addonCheckboxes.forEach(cb => {
+    const selected = itemData.addons.find(a => a.name === cb.value);
+    if (selected) cb.checked = true;
+  });
+
+  calculateTotal();
+  }, 10);
+  } else {
+    document.getElementById('catatan').value = '';
+    quantity = 1;
+    document.getElementById('qtyDisplay').innerText = quantity;
+  }
+
+  console.log("ItemData.note:", itemData?.note);
+
     calculateTotal();
+
+    document.body.classList.add('modal-open');
 
     document.getElementById('addonOverlay').style.display = 'flex';
     document.body.classList.add('blurred');
@@ -143,16 +167,19 @@
         return sum + Number(el.dataset.price); 
     }, 0);
     const total = (basePrice + addonTotal) * quantity;
-    document.getElementById('totalPrice').innerText = `Total: Rp${total.toLocaleString('id-ID')}`;
+    // document.getElementById('totalPrice').innerText = `Total: Rp${total.toLocaleString('id-ID')}`;
 
     // Tampilkan total harga di tombol
     document.getElementById('btnTotalHarga').innerText = `Rp${total.toLocaleString('id-ID')}`;
-
   }
 
   function closeAddonModal() {
+    document.body.classList.remove('modal-open');
+
     document.getElementById('addonOverlay').style.display = 'none';
     document.body.classList.remove('blurred');
+    document.getElementById('catatan').value = '';
+    editingIndex = null;
   }
 
   function submitAddon() {
@@ -164,7 +191,8 @@
     }));
 
     const catatan = document.getElementById('catatan').value;
-    document.getElementById('catatan').value = '';
+    // document.getElementById('catatan').value = '';
+    console.log("CATATAN:", document.getElementById('catatan').value);
 
     const image = getImageUrl(currentMenu).replace('/storage/', '');
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -176,7 +204,7 @@
       return;
     }
 
-    cart.push({
+    const newItem = {
       menu_id: menu_id,
       menu: currentMenu,
       basePrice: Number(basePrice),
@@ -184,12 +212,39 @@
       quantity,
       note: catatan,
       image: image 
-    });
+    };
 
-    localStorage.setItem('cart', JSON.stringify(cart));
+  const isEdit = editingIndex !== null;
+
+  if (isEdit) {
+    cart[editingIndex] = newItem;
+  } else {
+    cart.push(newItem);
+  }
+
+  editingIndex = null; // reset setelah pakai
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+
+  if (isEdit) {
+    Swal.fire({
+      icon: 'success',
+      title: 'Berhasil Diubah',
+      text: `${currentMenu} berhasil diperbarui.`,
+      timer: 1600,
+      showConfirmButton: false
+    });
+  } else {
+    Swal.fire({
+      icon: 'success',
+      title: 'Berhasil Ditambahkan',
+      text: `${currentMenu} berhasil ditambahkan ke keranjang.`,
+      timer: 1600,
+      showConfirmButton: false
+    });
+  }
 
     closeAddonModal();
-    alert(`${currentMenu} berhasil ditambahkan ke keranjang.`);
     updateCartCount();
     loadCart();
   }
@@ -207,6 +262,17 @@
       cartCountElement.innerText = totalQty;
     }
   }
+
+   function editItem(index) {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartItem = cart[index];
+
+    if (!cartItem) {
+      alert("Item tidak ditemukan!");
+      return;
+    }
+
+    openAddonModal(cartItem.menu, cartItem.menu_id, cartItem, index);
+  }
 </script>
 @endpush
-

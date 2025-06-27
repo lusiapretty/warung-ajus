@@ -36,10 +36,11 @@
     {{-- Script JS --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+    @stack('scripts') {{-- Untuk script tambahan dari halaman tertentu --}}
+
     <script>
         AOS.init();
     </script>
-
-    @stack('scripts') {{-- Untuk script tambahan dari halaman tertentu --}}
 </body>
 </html>

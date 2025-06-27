@@ -74,9 +74,9 @@
     </section>
 @endsection
 
-@push('scripts')
+@section('scripts')
     {{-- Tambahan script untuk AOS --}}
     <script>
         AOS.init();
     </script>
-@endpush
+@endsection
