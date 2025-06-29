@@ -120,11 +120,17 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     //PELANGGAN
     Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan.index');
 
-    // Order Routes
+    // Pesanan Pelanggan Routes
     Route::get('/admin/orders', [OrderController::class, 'index'])->name('admin.orders.index');
-    Route::get('/admin/orders/{id}', [OrderController::class, 'show'])->name('admin.orders.show');
     Route::put('/admin/orders/{id}/update', [OrderController::class, 'update'])->name('admin.orders.update');
     Route::delete('/admin/orders/{id}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
     Route::get('/admin/orders/{id}/print', [OrderController::class, 'print'])->name('admin.orders.print');
+    Route::get('/admin/orders/datatables', [OrderController::class, 'getDatatables'])->name('admin.orders.datatables');
+
+    Route::patch('/admin/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+
+    Route::get('/admin/orders/print/{order}', [OrderController::class, 'print'])->name('admin.orders.print');
+    Route::get('/admin/orders/export/pdf', [OrderController::class, 'exportPdf'])->name('admin.orders.export.pdf');
+
    });
 

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Midtrans\Config;
 use Midtrans\Snap;
 use App\Models\Menu;
+use App\Models\Order;
 
 class PaymentController extends Controller
 {
@@ -71,4 +72,33 @@ class PaymentController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function handleNotification(Request $request)
+    {
+        $orderId = $request->order_id;
+        $status = $request->transaction_status;
+
+        $order = Order::where('id', $orderId)->first();
+
+        if (!$order) return;
+
+        switch ($status) {
+            case 'settlement':
+            case 'capture':
+                $order->payment_status = 'paid';
+                break;
+            case 'expire':
+                $order->payment_status = 'expired';
+                break;
+            case 'cancel':
+            case 'deny':
+                $order->payment_status = 'failed';
+                break;
+            default:
+                $order->payment_status = 'pending';
+        }
+
+        $order->save();
+    }
+
 }
