@@ -13,6 +13,9 @@
   <link rel="stylesheet" href="{{ asset('template/dist/assets/fonts/material.css') }}">
   <link rel="stylesheet" href="{{ asset('template/dist/assets/css/style.css') }}" id="main-style-link">
   <link rel="stylesheet" href="{{ asset('template/dist/assets/css/style-preset.css') }}">
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+
 </head>
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
 
@@ -37,6 +40,7 @@
   </div>
 
   <!-- [Page Specific JS] start -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="{{ asset('template/dist/assets/js/plugins/apexcharts.min.js') }}"></script>
   <script src="{{ asset('template/dist/assets/js/pages/dashboard-default.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -59,6 +63,10 @@
   <script>preset_change("preset-1");</script>
    
   <script>font_change("Public-Sans");</script>
-  
+  <!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+@stack('scripts')
+
 </body>
 </html>

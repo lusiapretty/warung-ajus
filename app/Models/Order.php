@@ -15,10 +15,16 @@ class Order extends Model
         'tipe_pesanan',
         'pembayaran',
         'status',
+        'payment_status',
     ];
 
     public function items()
     {
         return $this->hasMany(OrderItem::class);
     }   
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
