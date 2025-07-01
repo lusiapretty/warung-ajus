@@ -9,8 +9,11 @@ use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\OrderExport;
 
 
 class OrderController extends Controller
@@ -80,6 +83,7 @@ class OrderController extends Controller
                     }
                 })
                 ->addColumn('order_id', fn($order) => $order->order_id)
+                ->addColumn('tanggal_order', fn($order) => $order->created_at->format('d-m-Y H:i:s'))
                 ->addColumn('nama_pelanggan', fn($order) => $order->nama_pelanggan ?? '-')
                 ->addColumn('nama_menu', fn($order) => $order->items->count() > 0
                     ? implode(', ', $order->items->map(fn($i) => $i->menu->nama_menu . ' (' . $i->jumlah . ')')->toArray())
@@ -94,6 +98,8 @@ class OrderController extends Controller
                     $order->items->sum(fn($i) => ($i->harga + collect(json_decode($i->addons))->sum('price')) * $i->jumlah),
                     0, ',', '.'
                 ))
+                ->addColumn('tipe_pesanan', fn($order) => $order->tipe_pesanan)
+                ->addColumn('no_meja', fn($order) => $order->no_meja ?? '-')              
                 ->addColumn('status_pembayaran', function ($order) {
                     $label = [
                         'pending' => 'Belum Dibayar',
@@ -129,6 +135,16 @@ class OrderController extends Controller
                     $html .= '</select></form>';
                     return $html;
                 })
+                ->addColumn('status_pesanan_export', function ($order) {
+                    $labels = [
+                        'pending'    => 'Menunggu',
+                        'processing' => 'Sedang Diproses',
+                        'completed'  => 'Selesai',
+                        'cancelled'  => 'Dibatalkan',
+                    ];
+                    return $labels[$order->status] ?? $order->status;
+                })
+
                 ->addColumn('aksi', function ($order) {
                     $html = '<div class="d-flex flex-wrap gap-2">';
 
@@ -139,10 +155,10 @@ class OrderController extends Controller
                     $html .= '<a href="' . route('admin.orders.print', $order->id) . '" target="_blank" class="btn btn-secondary btn-sm">'
                         . '<i class="fas fa-print"></i> Cetak Struk</a>';
 
-                    $html .= '<form action="' . route('admin.orders.destroy', $order->id) . '" method="POST" class="d-inline">'
-                        . csrf_field() . method_field('DELETE')
-                        . '<button type="submit" class="btn btn-danger btn-sm">Hapus</button>'
-                        . '</form>';
+                    // $html .= '<form action="' . route('admin.orders.destroy', $order->id) . '" method="POST" class="d-inline">'
+                    //     . csrf_field() . method_field('DELETE')
+                    //     . '<button type="submit" class="btn btn-danger btn-sm">Hapus</button>'
+                    //     . '</form>';
       
                     $html .= '</div>';
                                     
@@ -155,19 +171,70 @@ class OrderController extends Controller
         return response()->json(['error' => 'Not Ajax'], 400);
     }
 
+    public function getMejaTerpakai()
+    {
+        $limitWaktu = Carbon::now()->subMinutes(90); // batas waktu 90 menit
+
+        $mejaTerpakai = Order::where('tipe_pesanan', 'dine_in')
+            ->where(function ($query) use ($limitWaktu) {
+                $query->where('status', 'processing') // pesanan aktif
+                ->orWhere(function ($q) use ($limitWaktu) {
+                    $q->where('status', 'completed') // pesanan selesai
+                      ->where('updated_at', '>=', $limitWaktu); // tapi belum lewat 90 menit
+                });
+            })
+            ->whereNotNull('no_meja') 
+            ->pluck('no_meja')
+            ->map(fn($meja) => (int)$meja) 
+            ->unique() 
+            ->values(); 
+
+        return response()->json(['meja_terpakai' => $mejaTerpakai]);
+    }
+
     public function print(Order $order)
     {
         $order->load('items.menu');
         return view('admin.pesanan-pelanggan.print', compact('order'));
     }
 
-    public function exportPdf()
+    public function exportPdf(Request $request)
     {
-        $orders = Order::with('items.menu')->has('items')->orderBy('created_at', 'desc')->get();
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
 
-        $pdf = PDF::loadView('admin.pesanan-pelanggan.laporan', compact('orders'));
-        return $pdf->download('laporan-penjualan.pdf');
+        $start = Carbon::parse($request->start_date)->startOfDay();
+        $end   = Carbon::parse($request->end_date)->endOfDay();
+
+        $orders = Order::with(['items.menu'])
+            ->whereBetween('created_at', [$start, $end])
+            ->where('payment_status', 'paid')
+            ->where('status', 'completed')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.pesanan-pelanggan.laporan-pdf', compact('orders', 'start', 'end'));
+
+        return $pdf->download('laporan-penjualan-' . now()->format('Ymd') . '.pdf');
     }
 
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
 
+        $start = Carbon::parse($request->start_date)->startOfDay();
+        $end = Carbon::parse($request->end_date)->endOfDay();
+
+         $orders = Order::with('items.menu')
+            ->whereBetween('created_at', [$start, $end])
+            ->where('payment_status', 'paid')
+            ->where('status', 'completed')
+            ->get();
+
+        return Excel::download(new OrderExport($orders, $start, $end), 'laporan-penjualan-' . now()->format('Ymd') . '.xlsx');
+    }
 }

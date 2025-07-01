@@ -11,7 +11,10 @@
 </head>
 <body>
     <h2>Laporan Penjualan - WARUNG AJUS</h2>
-    <p>Tanggal: {{ now()->format('d-m-Y') }}</p>
+    <p>
+        Tanggal: {{ \Carbon\Carbon::parse($start)->format('d-m-Y') }} s/d {{ \Carbon\Carbon::parse($end)->format('d-m-Y') }}
+    </p>
+
     <table>
         <thead>
             <tr>
@@ -44,6 +47,21 @@
             </tr>
             @endforeach
         </tbody>
+
+         <tfoot>
+            <tr>
+                <td colspan="4"><strong>Total Pemasukan</strong></td>
+                <td colspan="3">
+                    @php
+                        $grandTotal = 0;
+                        foreach ($orders as $order) {
+                            $grandTotal += $order->items->sum(fn($i) => $i->harga * $i->jumlah);
+                        }
+                    @endphp
+                    <strong>Rp {{ number_format($grandTotal, 0, ',', '.') }}</strong>
+                </td>
+            </tr>
+        </tfoot>
     </table>
 </body>
 </html>
