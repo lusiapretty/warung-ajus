@@ -30,7 +30,7 @@ Route::get('/menu', [PageController::class, 'menu'])->name('menu.pelanggan');
 Route::get('/pesan', [PageController::class, 'pesan']);
 Route::get('/menu-makanan', [MenuController::class, 'indexMakanan'])->name('menu.makanan');
 Route::get('/menu-minuman', [MenuController::class, 'indexMinuman'])->name('menu.minuman');
-// Route::post('/checkout', [OrderController::class, 'store'])->name('checkout');
+Route::get('/meja-terpakai', [OrderController::class, 'getMejaTerpakai']);
 Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
 Route::post('/simpan-order', [CheckoutController::class, 'storeFromMidtrans'])->name('order.storeFormMidtrans');
 Route::post('/midtrans/token', [PaymentController::class, 'createSnapToken'])->name('midtrans.token');
@@ -131,6 +131,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/admin/orders/print/{order}', [OrderController::class, 'print'])->name('admin.orders.print');
     Route::get('/admin/orders/export/pdf', [OrderController::class, 'exportPdf'])->name('admin.orders.export.pdf');
+    Route::get('/admin/orders/export/excel', [OrderController::class, 'exportExcel'])->name('admin.orders.export.excel');
 
    });
 

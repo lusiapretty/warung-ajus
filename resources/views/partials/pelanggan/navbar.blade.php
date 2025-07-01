@@ -99,7 +99,9 @@
           </div>
           <div class="mb-3" id="no_meja_field" style="display: none;">
             <label for="no-meja" class="form-label">Nomor Meja</label>
-            <input type="text" class="form-control" id="no_meja" required>
+            <select class="form-control" id="no_meja" required>
+              <option disabled selected>-- Pilih No Meja --</option>
+            </select>
           </div>
 
           <!-- Ringkasan Keranjang -->
@@ -326,12 +328,43 @@ const baseAssetUrl = "{{ asset('img') }}/";
   function toggleCheckoutFields() {
     const tipe = document.getElementById('tipe_pesanan').value;
     const noMeja = document.getElementById('no_meja_field');
+    const noMejaSelect = document.getElementById('no_meja');
+
     if (tipe === 'dine_in') {
       noMeja.style.display = 'block';
-      document.getElementById('no_meja').required = true;
+      noMejaSelect.required = true;
+
+      // ambil data meja yang sudah terpakai
+      fetch('/meja-terpakai')
+        .then(response => {
+          if (!response.ok) throw new Error('Network response not OK');
+          return response.json(); 
+        })
+        .then(data => {
+          
+          const mejaTerpakai = data.meja_terpakai;
+          
+          // reset dan isi ulang
+          noMejaSelect.innerHTML = '<option disabled selected>-- Pilih No Meja --</option>';
+          for (let i = 1; i <= 20; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = 'Meja ' + i;
+            if (mejaTerpakai.includes(i)) {
+              option.disabled = true;
+              option.textContent += ' (terisi)';
+            }
+            noMejaSelect.appendChild(option);
+          }
+        })
+        .catch(error => {
+          console.error('Gagal ambil meja:', error);
+        });
+
     } else {
       noMeja.style.display = 'none';
-      document.getElementById('no_meja').required = false;
+      noMejaSelect.required = false;
+      noMejaSelect.innerHTML = '';
     }
   }
 
