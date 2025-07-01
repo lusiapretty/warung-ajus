@@ -109,7 +109,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: '{{ route('admin.orders.datatables') }}',
+            url: '{{ route('admin.orders.datatables', true) }}',
             data: function (d) {
                 d.status_pembayaran = $('#filter-status-pembayaran').val();
                 d.status_pesanan = $('#filter-status-pesanan').val();
@@ -127,13 +127,13 @@ $(document).ready(function () {
             }
         ],
         columns: [
-            { data: 'id', name: 'id' },
+            { data: 'order_id', name: 'order_id' },
             { data: 'nama_pelanggan', name: 'nama_pelanggan' },
             { data: 'nama_menu', name: 'nama_menu', orderable: false, searchable: false },
             { data: 'jumlah_total', name: 'jumlah_total', orderable: false, searchable: false },
             { data: 'catatan', name: 'catatan', orderable: false, searchable: false },
             { data: 'total_harga', name: 'total_harga', orderable: false, searchable: false },
-            { data: 'status_pembayaran', name: 'status_pembayaran', orderable: false, searchable: false },
+            { data: 'payment_status', name: 'payment_status', orderable: false, searchable: false },
             { data: 'status_pesanan', name: 'status_pesanan', orderable: false, searchable: false },
             { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
         ]

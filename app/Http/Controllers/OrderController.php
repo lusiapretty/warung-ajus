@@ -79,6 +79,7 @@ class OrderController extends Controller
                         });
                     }
                 })
+                ->addColumn('order_id', fn($order) => $order->order_id)
                 ->addColumn('nama_pelanggan', fn($order) => $order->nama_pelanggan ?? '-')
                 ->addColumn('nama_menu', fn($order) => $order->items->count() > 0
                     ? implode(', ', $order->items->map(fn($i) => $i->menu->nama_menu . ' (' . $i->jumlah . ')')->toArray())

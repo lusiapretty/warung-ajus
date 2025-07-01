@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Menu;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class CheckoutController extends Controller
@@ -35,12 +37,15 @@ class CheckoutController extends Controller
             ], 422);
         }
 
+        $orderId = 'ORDER-' . Str::uuid();
+
         // Simpan Order
         $order = Order::create([
+            'order_id'       => $orderId,
             'nama_pelanggan' => $data['nama_pelanggan'],
             'no_meja'        => $data['tipe_pesanan'] === 'dine_in' ? $data['no_meja'] : null,
             'tipe_pesanan'   => $data['tipe_pesanan'],
-            'pembayaran'     => $data['pembayaran'],
+            'pembayaran'     => $data['pembayaran'] ?? 'midtrans',
             'status'         => 'pending',
         ]);
 
@@ -69,46 +74,48 @@ class CheckoutController extends Controller
 
         return response()->json([
             'message' => 'Pesanan berhasil disimpan!', 
-            'order_id' => $order->id], 201);
+            'order_id' => $orderId], 201);
     }
 
     public function storeFromMidtrans(Request $request)
     {
-        $data = $request->all();
+        try {
+            $data = $request->all();
 
-        $order = Order::create([
-            'user_id'        => auth()->check() ? auth()->id() : null,
-            'nama_pelanggan' => $data['nama_pelanggan'],
-            'tipe_pesanan'   => $data['tipe_pesanan'],
-            'no_meja'        => $data['no_meja'],
-            'pembayaran'     => $data['pembayaran'],
-            'status'         => 'paid',
-            'total'          => $data['total'],
-        ]);
+            Log::info('DATA MASUK DARI MIDTRANS:', $data);
 
-        foreach ($data['menu'] as $item) {
-            OrderItem::create([
-                'order_id'  => $order->id,
-                'menu_id'   => $item['menu_id'],
-                'nama_menu' => Menu::find($item['menu_id'])->nama_menu ?? 'Tidak diketahui',
-                'jumlah'    => $item['quantity'],
-                'harga'     => $item['basePrice'],
-                'catatan'   => $item['catatan'],
-                'addons'    => json_encode($item['addons'] ?? []),
+            $order = Order::create([
+                'order_id'        => $data['order_id'] ?? 'ORDER-' . Str::uuid(),
+                'user_id'         => auth()->check() ? auth()->id() : null,
+                'nama_pelanggan'  => $data['nama_pelanggan'],
+                'tipe_pesanan'    => $data['tipe_pesanan'],
+                'no_meja'         => $data['tipe_pesanan'] === 'dine_in' ? $data['no_meja'] : null,
+                'pembayaran'      => 'midtrans',
+                'status'          => 'processing', 
+                'payment_status'  => 'paid',
+                'total'           => $data['total'],
             ]);
 
-            if (!empty($item['addons'])) {
-                foreach ($item['addons'] as $addon) {
-                    $order->addons()->create([
-                        'addon_id' => $addon['id'],
-                        'order_id' => $order->id,
-                        'harga' => $addon['price'],
-                    ]);
-                }
-            }
-        }
+            foreach ($data['menu'] as $item) {
+                $menu = Menu::find($item['menu_id']);
 
-        return response()->json(['message' => 'Order berhasil disimpan']);
+                OrderItem::create([
+                    'order_id'  => $order->id,
+                    'menu_id'   => $item['menu_id'],
+                    'nama_menu' => $menu ? $menu->nama_menu : 'Tidak diketahui',
+                    'jumlah'    => $item['quantity'],
+                    'harga'     => $item['basePrice'],
+                    'catatan'   => $item['note'] ?? null,
+                    'addons'    => json_encode($item['addons'] ?? []),
+                ]);
+
+            }
+
+            return response()->json(['message' => 'Order berhasil disimpan']);
+        } catch (\Exception $e) {
+            Log::error('Gagal menyimpan order dari Midtrans: ' . $e->getMessage());
+            return response()->json(['message' => 'Terjadi kesalahan saat menyimpan order.'], 500);
+        }
     }
 
 }

@@ -356,7 +356,10 @@ const baseAssetUrl = "{{ asset('img') }}/";
         grandTotal += (basePrice + addonTotal) * (item.quantity || 1);
       });
 
+    const generatedOrderId = 'ORDER-' + Date.now(); 
+
     const payload = {
+      order_id: generatedOrderId,
       nama_pelanggan: nama,
       tipe_pesanan,
       no_meja: tipe_pesanan === 'dine_in' ? no_meja : null,
@@ -389,6 +392,7 @@ const baseAssetUrl = "{{ asset('img') }}/";
             onSuccess: function(result) {
             // Setelah pembayaran berhasil, simpan order
             const simpanPayload = {
+              order_id: generatedOrderId,
               nama_pelanggan: nama,
               tipe_pesanan,
               no_meja: tipe_pesanan === 'dine_in' ? no_meja : null,
@@ -396,7 +400,7 @@ const baseAssetUrl = "{{ asset('img') }}/";
               menu: cart
             };
 
-            fetch('/simpan-order', {
+           fetch('/simpan-order', {
               method: 'POST',
               headers: {
                 "Content-Type": "application/json",
@@ -404,7 +408,15 @@ const baseAssetUrl = "{{ asset('img') }}/";
               },
               body: JSON.stringify(simpanPayload)
             })
-            .then(res => res.json())
+            .then(res => {
+              if (!res.ok) {
+                return res.text().then(errText => {
+                  console.error("Response bukan JSON:", errText);
+                  throw new Error("Gagal menyimpan pesanan.");
+                });
+              }
+              return res.json();
+            })
             .then(data => {
               localStorage.removeItem('cart');
               updateCartCount();
@@ -415,6 +427,7 @@ const baseAssetUrl = "{{ asset('img') }}/";
               console.error(err);
               alert("Pesanan berhasil dibayar, tapi gagal disimpan. Hubungi admin.");
             });
+
           },
 
           onPending: function(result) {
@@ -433,9 +446,7 @@ const baseAssetUrl = "{{ asset('img') }}/";
     })
 
     .catch(error => {
-      // console.error('Error:', error);
       alert("Terjadi kesalahan saat mengirim pesanan.");
-      // console.error(error);
     });
   });
 
@@ -489,7 +500,6 @@ const baseAssetUrl = "{{ asset('img') }}/";
       return;
     }
 
-    // 🚨 Tambahkan ini sebelum buka modal baru
     const cartModal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
     if (cartModal) {
       cartModal.hide();
