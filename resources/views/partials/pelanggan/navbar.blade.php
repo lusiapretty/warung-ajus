@@ -30,7 +30,7 @@
 
         <ul class="dropdown-list">
           <li><a href="{{ route('profil.edit') }}"><i class="fas fa-user-circle"></i> Profil Saya</a></li>
-          <li><a href="#"><i class="fas fa-box-open"></i> Pesanan Saya</a></li>
+          <li><a href="{{ route('pesanan.saya')}}"><i class="fas fa-box-open"></i> Pesanan Saya</a></li>
         </ul>
 
         <form method="POST" action="{{ route('logout') }}">
@@ -123,9 +123,17 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    const isLoggedIn = @json(Auth::check());
+    const userId = {{ Auth::check() ? Auth::user()->id : 'null' }};
+    const userRole = "{{ Auth::check() ? Auth::user()->role : '' }}";
+    const cartKey = isLoggedIn ? `cart_user_${userId}` : 'cart_guest';
+    const storage = isLoggedIn ? localStorage : sessionStorage;
+</script>
+
+<script>
 const baseAssetUrl = "{{ asset('img') }}/";
   function loadCart() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(storage.getItem(cartKey)) || [];
     const container = document.getElementById('cartContainer');
     container.innerHTML = '';
     let grandTotal = 0;
@@ -161,9 +169,6 @@ const baseAssetUrl = "{{ asset('img') }}/";
                 </div>
                 <ul>${addonList || ''}</ul>
                 <p class="card-text">Catatan: ${item.note || '-'}</p>
-                <div class="mb-2">
-                  <button class="btn btn-warning btn-sm btn-edit-menu" onclick="editItem(${index})">Edit</button>
-                </div>
                 <div class="quantity-control-cart">
                   <i class="fas fa-minus" onclick="changeQty(${index}, -1)"></i>
                   <span class="fw-bold">${item.quantity}</span>
@@ -181,15 +186,15 @@ const baseAssetUrl = "{{ asset('img') }}/";
   }
 
   function removeItem(index) {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(storage.getItem(cartKey)) || [];
     cart.splice(index, 1);
-    localStorage.setItem('cart', JSON.stringify(cart));
+    storage.setItem(cartKey, JSON.stringify(cart));
     loadCart();
     updateCartCount();
   }
 
   function changeQty(index, delta) {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(storage.getItem(cartKey)) || [];
     if (!cart[index]) return;
 
     const currentQty = cart[index].quantity;
@@ -207,7 +212,7 @@ const baseAssetUrl = "{{ asset('img') }}/";
       }).then((result) => {
         if (result.isConfirmed) {
           cart.splice(index, 1);
-          localStorage.setItem('cart', JSON.stringify(cart));
+          storage.setItem(cartKey, JSON.stringify(cart));
           loadCart();
           updateCartCount();
           Swal.fire({
@@ -225,12 +230,12 @@ const baseAssetUrl = "{{ asset('img') }}/";
     cart[index].quantity += delta;
     if (cart[index].quantity < 1) cart[index].quantity = 1;
 
-    localStorage.setItem('cart', JSON.stringify(cart));
+    storage.setItem(cartKey, JSON.stringify(cart));
     loadCart();
   }
 
   function showCheckoutModal() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(storage.getItem(cartKey)) || [];
     if (cart.length === 0) {
       alert("Keranjang masih kosong!");
       return;
@@ -273,19 +278,55 @@ const baseAssetUrl = "{{ asset('img') }}/";
     new bootstrap.Modal(document.getElementById('checkoutModal')).show();
   }
 
+  function promptLoginFirst() {
+    Swal.fire({
+      title: 'Login Diperlukan',
+      text: 'Silakan login terlebih dahulu untuk melakukan pemesanan.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Login',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "/login";
+      }
+    });
+  }
+
   function openCheckoutModal() {
+    const cart = JSON.parse(storage.getItem(cartKey)) || [];
+
+    if (cart.length === 0) {
+      Swal.fire({
+        title: 'Keranjang Kosong',
+        text: 'Silakan tambahkan menu terlebih dahulu sebelum melakukan checkout.',
+        icon: 'info',
+        confirmButtonText: 'Oke'
+      }).then(() => {
+        const cartModalEl = document.getElementById('cartModal');
+        const cartModalInstance = bootstrap.Modal.getInstance(cartModalEl);
+        if (cartModalInstance) {
+          cartModalInstance.hide();
+        }
+      });
+      return;
+    }
+
     const cartModalEl = document.getElementById('cartModal');
     const cartModalInstance = bootstrap.Modal.getInstance(cartModalEl);
     if (cartModalInstance) {
       cartModalInstance.hide();
     }
-    
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    if (cart.length === 0) {
-      alert("Keranjang masih kosong!");
+
+    // Jika user belum login atau bukan pelanggan, arahkan untuk login
+    if (!isLoggedIn || userRole !== 'pelanggan') {
+      setTimeout(() => {
+        promptLoginFirst();
+      }, 300); 
       return;
     }
 
+    // lanjut render ringkasan pesanan & tampilkan modal checkout seperti sebelumnya
     let grandTotal = 0;
     const summaryContanier = document.getElementById('checkoutSummary');
     summaryContanier.innerHTML = '';
@@ -375,7 +416,7 @@ const baseAssetUrl = "{{ asset('img') }}/";
       const nama = document.getElementById('nama_pelanggan').value;
       const no_meja = document.getElementById('no_meja').value;
 
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const cart = JSON.parse(storage.getItem(cartKey)) || [];
 
       if (!tipe_pesanan || !nama || (tipe_pesanan === 'dine_in' && !no_meja)) {
         alert("Mohon lengkapi semua data pelanggan.");
@@ -451,7 +492,7 @@ const baseAssetUrl = "{{ asset('img') }}/";
               return res.json();
             })
             .then(data => {
-              localStorage.removeItem('cart');
+              storage.removeItem(cartKey);
               updateCartCount();
               loadCart();
               window.location.href = '/';
@@ -485,7 +526,7 @@ const baseAssetUrl = "{{ asset('img') }}/";
 
   // Fungsi untuk memperbarui angka keranjang
   function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(storage.getItem(cartKey)) || [];
     let totalQty = 0;
 
     cart.forEach(item => {
@@ -525,8 +566,8 @@ const baseAssetUrl = "{{ asset('img') }}/";
 
   // Fungsi editItem 
   function editItem(index) {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartitem = cart[index];
+    const cart = JSON.parse(storage.getItem(cartKey)) || [];
+    const cartItem = cart[index];
 
     if (!cartItem) {
       alert("Item tidak ditemukan!");
@@ -538,6 +579,6 @@ const baseAssetUrl = "{{ asset('img') }}/";
       cartModal.hide();
     }
 
-    openAddonModal(cartItem.menu, item.menu_id, item, index);
+    openAddonModal(cartItem.menu, cartItem.menu_id, cartItem, index);
   }
 </script>

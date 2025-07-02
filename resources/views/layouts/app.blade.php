@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/menu.css') }}">
     <link rel="stylesheet" href="{{ asset('css/tentang-kami.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/profil.css') }}">
 
     @stack('styles') {{-- Untuk inject CSS tambahan dari halaman tertentu --}}
 </head>

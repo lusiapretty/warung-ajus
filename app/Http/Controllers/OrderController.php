@@ -33,6 +33,16 @@ class OrderController extends Controller
         return view('admin.pesanan-pelanggan.index', compact('orders'));
     }
 
+    public function pesananSaya()
+    {
+        $orders = Order::where('user_id', auth()->id())
+                    ->with('items.menu') // jika relasi sudah dibuat
+                    ->latest()
+                    ->get();
+
+        return view('pelanggan.pesanan', compact('orders'));
+    }
+
     public function updateStatus(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
