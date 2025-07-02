@@ -15,6 +15,20 @@ class CheckoutController extends Controller
 {
     public function checkout(Request $request)
     {
+        // ✅ Cek apakah user sudah login
+        if (!auth()->check()) {
+            return response()->json([
+                'message' => 'Silakan login terlebih dahulu untuk melakukan pemesanan.'
+            ], 401);
+        }
+
+        // ✅ Cek apakah user adalah pelanggan
+        if (auth()->user()->role !== 'pelanggan') {
+            return response()->json([
+                'message' => 'Hanya pengguna yang sudah login yang dapat melakukan pemesanan.'
+            ], 403);
+        }
+
         $data = $request->all();
 
         $validator = Validator::make($data, [
@@ -47,11 +61,21 @@ class CheckoutController extends Controller
             'tipe_pesanan'   => $data['tipe_pesanan'],
             'pembayaran'     => $data['pembayaran'] ?? 'midtrans',
             'status'         => 'pending',
+            'user_id'        => auth()->id(), 
         ]);
+
+        $totalHarga = 0;
 
         // Simpan OrderItem
         foreach ($data['menu'] as $item) {
             $menu = Menu::find($item['menu_id']);
+
+            $hargaMenu = $item['basePrice'];
+            $jumlah = $item['quantity'];
+            $addonTotal = collect($item['addons'] ?? [])->sum('price');
+            $totalItem = ($hargaMenu + $addonTotal) * $jumlah;
+
+            $totalHarga += $totalItem;
 
             if (!$menu) {
                 return response()->json([
@@ -64,13 +88,15 @@ class CheckoutController extends Controller
                 'order_id' => $order->id,
                 'menu_id' => $item['menu_id'],
                 'nama_menu' => $menu ? $menu->nama_menu : 'Menu Tidak Ditemukan',
-                'jumlah'  => $item['quantity'],
-                'harga'   => $item['basePrice'], 
+                'jumlah'  => $jumlah,
+                'harga'   => $hargaMenu, 
                 'addons'  => json_encode($item['addons'] ?? []),
                 'catatan' => $item['catatan'] ?? null,
 
             ]);
         }
+
+        $order->update(['total' => $totalHarga]);
 
         return response()->json([
             'message' => 'Pesanan berhasil disimpan!', 

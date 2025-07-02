@@ -195,7 +195,7 @@
     console.log("CATATAN:", document.getElementById('catatan').value);
 
     const image = getImageUrl(currentMenu).replace('/storage/', '');
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(storage.getItem(cartKey)) || [];
 
     const menu_id = currentMenuId;
 
@@ -224,7 +224,7 @@
 
   editingIndex = null; // reset setelah pakai
 
-  localStorage.setItem('cart', JSON.stringify(cart));
+  storage.setItem(cartKey, JSON.stringify(cart));
 
   if (isEdit) {
     Swal.fire({
@@ -250,7 +250,7 @@
   }
 
   function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(storage.getItem(cartKey)) || [];
     let totalQty = 0;
 
     cart.forEach(item => {
@@ -264,7 +264,7 @@
   }
 
    function editItem(index) {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(storage.getItem(cartKey)) || [];
     const cartItem = cart[index];
 
     if (!cartItem) {

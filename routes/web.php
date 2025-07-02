@@ -23,22 +23,6 @@ use App\Http\Controllers\PelangganController;
 |--------------------------------------------------------------------------
 */
 
-// ===== Public Routes (Pelanggan) =====
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/tentang', [PageController::class, 'tentang'])->name('tentang');
-Route::get('/menu', [PageController::class, 'menu'])->name('menu.pelanggan');
-Route::get('/pesan', [PageController::class, 'pesan']);
-Route::get('/menu-makanan', [MenuController::class, 'indexMakanan'])->name('menu.makanan');
-Route::get('/menu-minuman', [MenuController::class, 'indexMinuman'])->name('menu.minuman');
-Route::get('/meja-terpakai', [OrderController::class, 'getMejaTerpakai']);
-Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
-Route::post('/simpan-order', [CheckoutController::class, 'storeFromMidtrans'])->name('order.storeFormMidtrans');
-Route::post('/midtrans/token', [PaymentController::class, 'createSnapToken'])->name('midtrans.token');
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/profil', [ProfileController::class, 'edit'])->name('profil.edit');
-    Route::post('/profil', [ProfileController::class, 'update'])->name('profil.update');
-});
 
 // ===== Auth Routes =====
 // Login
@@ -91,10 +75,26 @@ Route::post('/reset-password', function (Request $request) {
         : back()->withErrors(['email' => [__($status)]]);
 })->middleware('guest')->name('password.update');
 
-// ===== Pelanggan Route =====
+// ===== Public Routes (Pelanggan) =====
 Route::middleware(['auth', 'role:pelanggan'])->get('/home', function () {
     return view('home');
 })->name('pelanggan.home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/tentang', [PageController::class, 'tentang'])->name('tentang');
+Route::get('/menu', [PageController::class, 'menu'])->name('menu.pelanggan');
+Route::get('/pesan', [PageController::class, 'pesan']);
+Route::get('/menu-makanan', [MenuController::class, 'indexMakanan'])->name('menu.makanan');
+Route::get('/menu-minuman', [MenuController::class, 'indexMinuman'])->name('menu.minuman');
+Route::get('/meja-terpakai', [OrderController::class, 'getMejaTerpakai']);
+Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout')->middleware('auth');
+Route::post('/simpan-order', [CheckoutController::class, 'storeFromMidtrans'])->name('order.storeFormMidtrans');
+Route::post('/midtrans/token', [PaymentController::class, 'createSnapToken'])->name('midtrans.token');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profil', [ProfileController::class, 'edit'])->name('profil.edit');
+    Route::post('/profil', [ProfileController::class, 'update'])->name('profil.update');
+    Route::get('/pesanan-saya', [OrderController::class, 'pesananSaya'])->name('pesanan.saya');
+});
 
 // ===== Admin Routes =====
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -116,8 +116,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::put('/admin/addons/update/{id}', [AddonController::class, 'update'])->name('admin.addons.update');
     Route::delete('/admin/addons/{id}', [AddonController::class, 'destroy'])->name('admin.addons.destroy');
 
-
-    //PELANGGAN
+    //Pelanggan Routes
     Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan.index');
 
     // Pesanan Pelanggan Routes
