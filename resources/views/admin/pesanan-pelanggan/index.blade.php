@@ -31,6 +31,9 @@
     -webkit-overflow-scrolling: touch;
 }
 
+.dataTables_length {
+    margin-bottom: 10px;
+}
 </style>
 
 <!-- Main Content -->
@@ -81,7 +84,7 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered" id="menu-table">
+                        <table class="table table-bordered table-striped" id="menu-table">
                             <thead>
                                 <tr>
                                     <th>Order Id</th>
@@ -276,5 +279,9 @@ $(document).ready(function () {
 });
 
 </script>
+
+<div class="pc-content" style="display:none;"></div>
+<div class="footer-wrapper" style="display:none;"></div>
+
 @endpush
 
