@@ -27,7 +27,14 @@ class MenuController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Menu::with('addons')->get();
+            $query = Menu::with('addons')->latest();
+
+            if ($request->has('kategori') && $request->kategori != '') {
+                $query->where('kategori', $request->kategori);
+            }
+
+            $data = $query->get();
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('gambar', function ($row) {
@@ -37,20 +44,17 @@ class MenuController extends Controller
                     }
                     return '-';
                 })
-
                 ->addColumn('addons', function ($row) {
                     return $row->addons->pluck('nama')->implode(', ');
                 })
-
                 ->addColumn('aksi', function ($row) {
-                    $btn = '
+                    return '
                         <button type="button" data-id="' . $row->id . '" class="btn btn-sm btn-primary btn-edit">
-                            <i class="fas fa-pen-alt"></i>Edit
+                            <i class="fas fa-pen-alt"></i> Edit
                         </button>
                         <button type="button" data-id="' . $row->id . '" class="btn btn-sm btn-danger btn-delete">
-                            <i class="fas fa-trash-alt"></i>Hapus
+                            <i class="fas fa-trash-alt"></i> Hapus
                         </button>';
-                    return $btn;
                 })
                 ->rawColumns(['gambar', 'aksi'])
                 ->make(true);
@@ -58,7 +62,6 @@ class MenuController extends Controller
         $addons = Addon::all();
         return view('admin.menu.index', compact('addons'));
     }
-
     public function create()
     {
         return view('admin.menu.create');
@@ -66,28 +69,37 @@ class MenuController extends Controller
 
     public function store(Request $request)
     {
-        Log::info('Masuk ke AdminController@store', $request->all());
+        Log::info('Masuk ke MenuController@store', $request->all());
 
         $validateData = $request->validate([
             'nama_menu' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'harga' => 'required|numeric',
             'kategori' => 'required',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'gambar' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         if ($request->hasFile('gambar')) {
             $file = $request->file('gambar');
-            Log::info('File gambar valid?', ['isValid' => $file->isValid()]);
+
             if ($file->isValid()) {
-                $validateData['gambar'] = $file->store('menu', 'public');
+                $ext = $file->getClientOriginalExtension();
+                $filename = time() . '_' . uniqid() . '.' . $ext;
+
+                try {
+                    $path = $file->storeAs('menu', $filename, 'public');
+                    Log::info('File berhasil disimpan ke:', ['path' => $path]);
+
+                    $validateData['gambar'] = $path;
+                } catch (\Exception $e) {
+                    Log::error('Gagal simpan file: ' . $e->getMessage());
+                    return response()->json(['success' => false, 'message' => 'Gagal menyimpan gambar.'], 500);
+                }
             } else {
-                Log::warning('File gambar tidak valid');
+                Log::warning('File upload tidak valid!');
             }
-        } else {
-            Log::warning('Tidak ada file gambar di request');
         }
-        
+
         $menu = Menu::create($validateData);
 
         if ($request->has('addons')) {
@@ -95,7 +107,7 @@ class MenuController extends Controller
         }
 
         return response()->json([
-            'success' => true, 
+            'success' => true,
             'message' => 'Menu berhasil ditambahkan!',
             'menu' => [
                 'id' => $menu->id,
@@ -104,7 +116,7 @@ class MenuController extends Controller
                 'harga' => $menu->harga,
                 'kategori' => $menu->kategori,
                 'addons' => $menu->addons,
-                'gambar' => asset('storage/' . $menu->gambar),
+                'gambar' => $menu->gambar ? asset('storage/' . $menu->gambar) : null,
             ]
         ]);
     }
@@ -134,31 +146,69 @@ class MenuController extends Controller
     {
         Log::info('Isi request update: ', $request->all());
 
-        try {
-            
-            $menu = Menu::findOrFail($id);
+        $menu = Menu::findOrFail($id);
 
-            $menu->nama_menu = $request->nama_menu;
-            $menu->deskripsi = $request->deskripsi;
-            $menu->harga = $request->harga;
-            $menu->kategori = $request->kategori;
+        // Validasi data
+        $validatedData = $request->validate([
+            'nama_menu' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'harga' => 'required|numeric',
+            'kategori' => 'required|string',
+            'gambar' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            'addons' => 'nullable|array',
+        ]);
 
-            if ($request->hasFile('gambar')) {
-                $gambar = $request->file('gambar');
-                $namaFile = time().'.'.$gambar->getClientOriginalExtension();
-                $gambar->move(public_path('uploads'), $namaFile);
-                // $gambarPath = $request->file('gambar')->store('menu', 'public');
-                $menu->gambar = 'uploads/' . $namaFile; // Simpan path gambar
+        // Update field teks
+        $menu->nama_menu = $validatedData['nama_menu'];
+        $menu->deskripsi = $validatedData['deskripsi'] ?? null;
+        $menu->harga = $validatedData['harga'];
+        $menu->kategori = $validatedData['kategori'];
+
+        // Jika ada file gambar baru
+        if ($request->hasFile('gambar')) {
+            $file = $request->file('gambar');
+
+            if ($file->isValid()) {
+                $ext = $file->getClientOriginalExtension();
+                $filename = time() . '_' . uniqid() . '.' . $ext;
+
+                try {
+                    // Hapus gambar lama jika ada
+                    if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
+                        Storage::disk('public')->delete($menu->gambar);
+                    }
+
+                    // Simpan gambar baru ke folder storage/app/public/menu/
+                    $path = $file->storeAs('menu', $filename, 'public');
+
+                    // Simpan path ke database
+                    $menu->gambar = $path;
+                } catch (\Exception $e) {
+                    Log::error('Gagal menyimpan gambar saat update: ' . $e->getMessage());
+                    return response()->json(['success' => false, 'message' => 'Gagal menyimpan gambar.'], 500);
+                }
             }
-
-            $menu->save();
-            $menu->addons()->sync($request->addons ?? []);
-
-            return response()->json(['success' => true, 'message' => 'Menu berhasil diperbarui!', 'menu' => $menu]);
-        } catch (\Exception $e) {
-            Log::error('Error saat update menu: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Gagal memperbarui menu'], 500);
         }
+
+        // Simpan perubahan
+        $menu->save();
+
+        // Sinkronisasi relasi addons
+        $menu->addons()->sync($request->addons ?? []);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Menu berhasil diperbarui!',
+            'menu' => [
+                'id' => $menu->id,
+                'nama_menu' => $menu->nama_menu,
+                'deskripsi' => $menu->deskripsi,
+                'harga' => $menu->harga,
+                'kategori' => $menu->kategori,
+                'addons' => $menu->addons,
+                'gambar' => $menu->gambar ? asset('storage/' . $menu->gambar) : null,
+            ]
+        ]);
     }
 
     public function destroy($id)

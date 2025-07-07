@@ -1,3 +1,28 @@
+<style>
+    .dataTables_length select {
+        padding-right: 24px; 
+        background-position: right center;
+        background-repeat: no-repeat;
+        background-size: 16px 16px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20fill='gray'%20class='bi%20bi-caret-down-fill'%20viewBox='0%200%2016%2016'%3E%3Cpath%20d='M7.247%2011.14%202.451%205.658c-.566-.64-.106-1.658.753-1.658h9.592c.86%200%201.32%201.018.753%201.658L8.753%2011.14a1%201%200%200%201-1.506%200z'/%3E%3C/svg%3E");
+    }
+
+    #tabelPelanggan {
+        font-size: 0.85rem; /* Ukuran font isi tabel */
+    }
+
+    #tabelPelanggan thead th {
+        font-size: 0.9rem;  /* Ukuran font header kolom (opsional) */
+        font-weight: bold;
+    }
+
+    #tabelPelanggan tbody td {
+        font-size: 0.85rem;  /* Ukuran font isi baris */
+    }
+</style>
 @extends('layouts.admin')
 
 @section('content')

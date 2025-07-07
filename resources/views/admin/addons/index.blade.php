@@ -1,14 +1,68 @@
+<style>
+    .dataTables_length select {
+        padding-right: 24px;
+        background-position: right center;
+        background-repeat: no-repeat;
+        background-size: 16px 16px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20fill='gray'%20class='bi%20bi-caret-down-fill'%20viewBox='0%200%2016%2016'%3E%3Cpath%20d='M7.247%2011.14%202.451%205.658c-.566-.64-.106-1.658.753-1.658h9.592c.86%200%201.32%201.018.753%201.658L8.753%2011.14a1%201%200%200%201-1.506%200z'/%3E%3C/svg%3E");
+    }
+
+    #addon-table {
+        font-size: 0.85rem;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    #addon-table, 
+    #addon-table th, 
+    #addon-table td {
+        border: 1px solid #dee2e6 !important;
+    }
+
+    #addon-table thead th {
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+
+    #addon-table tbody td {
+        font-size: 0.85rem;
+    }
+
+    #addon-table th, 
+    #addon-table td {
+        vertical-align: middle;
+        padding: 8px 12px;
+    }
+    #addon-table th:first-child,
+    #addon-table td:first-child {
+        width: 20px;
+    }
+
+    th.col-no, td.col-no {
+        width: 20px !important;
+        text-align: center;
+    }
+    
+    th.no-sort::before,
+    th.no-sort::after {
+        display: none !important;
+    }
+</style>
+
 @extends('layouts.admin')
 
 @section('content')
 <div class="container mt-4">
     <h4>Daftar Add-ons</h4>
-    <button class="btn btn-success mb-3" data-toggle="modal" data-target="#addonModal">Tambah Add-on</button>
+    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addonModal">Tambah Add-on</button>
 
-    <table class="table table-bordered" id="addon-table">
+    <table class="table table-bordered table-striped" id="addon-table">
         <thead>
             <tr>
-                <th>No</th>
+                <th class="col-no no-sort">No</th>
                 <th>Nama Add-on</th>
                 <th>Harga</th>
                 <th>Aksi</th>
@@ -59,9 +113,9 @@ $(document).ready(function () {
         serverSide: true,
         ajax: "{{ route('admin.addons.index') }}",
         columns: [
-            { data: 'DT_RowIndex', orderable: false, searchable: false },
+            { data: 'DT_RowIndex', orderable: false, searchable: false},
             { data: 'nama' },
-            { data: 'harga' },
+            { data: 'harga',orderable: false },
             { data: 'aksi', orderable: false, searchable: false }
         ]
     });

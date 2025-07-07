@@ -125,6 +125,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/admin/orders/{id}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
     Route::get('/admin/orders/{id}/print', [OrderController::class, 'print'])->name('admin.orders.print');
     Route::get('/admin/orders/datatables', [OrderController::class, 'getDatatables'])->name('admin.orders.datatables');
+    Route::get('/admin/orders/{order}', [AdminController::class, 'show'])->name('admin.orders.show');
 
     Route::patch('/admin/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 
