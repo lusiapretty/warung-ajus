@@ -34,7 +34,7 @@
 <body>
     <h2>WARUNG AJUS</h2>
     <h4>Struk Pembayaran</h4>
-    <p>No Pesanan: #{{ $order->id }}</p>
+    <p>No Pesanan: {{ $order->order_id }}</p>
     <p>Tanggal: {{ $order->created_at->format('d-m-Y H:i') }}</p>
     <p>Nama Pelanggan: {{ $order->nama_pelanggan ?? '-' }}</p>
     <hr>
@@ -65,9 +65,25 @@
     </table>
 
     <div class="total">
-            <p><strong>Total Pesanan: Rp {{ number_format($total, 0, ',', '.') }}</strong></p>
-        <p>Status Pembayaran: {{ ucfirst($order->payment_status) }}</p>
-        <p>Status Pesanan: {{ ucfirst($order->status) }}</p>
+        <p><strong>Total Pesanan: Rp {{ number_format($total, 0, ',', '.') }}</strong></p>
+        @php
+            $statusPembayaran = [
+                'pending' => 'Belum Dibayar',
+                'paid' => 'Sudah Dibayar',
+                'failed' => 'Gagal',
+                'expired' => 'Kedaluwarsa',
+            ];
+
+            $statusPesanan = [
+                'pending' => 'Menunggu',
+                'processing' => 'Sedang Diproses',
+                'completed' => 'Selesai',
+                'cancelled' => 'Dibatalkan',
+            ];
+        @endphp
+
+        <p>Status Pembayaran: {{ $statusPembayaran[$order->payment_status] ?? ucfirst($order->payment_status) }}</p>
+        <p>Status Pesanan: {{ $statusPesanan[$order->status] ?? ucfirst($order->status) }}</p>
     </div>
 
     <p>Terima kasih!</p>

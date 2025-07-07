@@ -32,6 +32,10 @@
                     </tr>
                     @endif
                     <tr>
+                        <td class="fw-bold text-start">Metode Pembayaran</td>
+                        <td>: {{ ucfirst($order->pembayaran) ?? '-' }}</td>
+                    </tr>
+                    <tr>
                         <td class="fw-bold text-start">Status Pembayaran</td>
                         <td>: 
                             @php

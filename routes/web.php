@@ -127,11 +127,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/orders/datatables', [OrderController::class, 'getDatatables'])->name('admin.orders.datatables');
     Route::get('/admin/orders/{order}', [AdminController::class, 'show'])->name('admin.orders.show');
 
+    Route::patch('/admin/orders/{order}/update-payment-status', [OrderController::class, 'updatePaymentStatus'])->name('admin.orders.updatePaymentStatus');
     Route::patch('/admin/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 
     Route::get('/admin/orders/print/{order}', [OrderController::class, 'print'])->name('admin.orders.print');
     Route::get('/admin/orders/export/pdf', [OrderController::class, 'exportPdf'])->name('admin.orders.export.pdf');
     Route::get('/admin/orders/export/excel', [OrderController::class, 'exportExcel'])->name('admin.orders.export.excel');
 
-   });
+});
 

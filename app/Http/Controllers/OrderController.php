@@ -43,6 +43,23 @@ class OrderController extends Controller
         return view('pelanggan.pesanan', compact('orders'));
     }
 
+    public function updatePaymentStatus(Request $request, Order $order)
+    {
+        $request->validate([
+            'payment_status' => 'required|in:pending,paid',
+        ]);
+
+        // Hanya bisa mengubah status pembayaran jika tipe pembayaran adalah cash
+        if ($order->pembayaran !== 'cash') {
+            return back()->with('error', 'Status pembayaran hanya bisa diubah untuk metode pembayaran cash.');
+        }
+
+        $order->payment_status = $request->payment_status;
+        $order->save();
+
+        return back()->with('success', 'Status pembayaran berhasil diperbarui.');
+    }
+
     public function updateStatus(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -110,7 +127,7 @@ class OrderController extends Controller
                 ))
                 ->addColumn('tipe_pesanan', fn($order) => $order->tipe_pesanan)
                 ->addColumn('no_meja', fn($order) => $order->no_meja ?? '-')              
-                ->addColumn('status_pembayaran', function ($order) {
+                ->addColumn('payment_status', function ($order) {
                     $label = [
                         'pending' => 'Belum Dibayar',
                         'paid' => 'Sudah Dibayar',
@@ -123,7 +140,21 @@ class OrderController extends Controller
                         'failed' => 'danger',
                         'expired' => 'secondary',
                     ];
-                    return '<span class="badge badge-' . ($color[$order->payment_status] ?? 'light') . '">' . ($label[$order->payment_status] ?? $order->payment_status) . '</span>';
+
+                    if ($order->pembayaran === 'cash' && $order->payment_status !== 'paid') {
+                        return '
+                            <div class="text-center">
+                                <form method="POST" action="' . route('admin.orders.updatePaymentStatus', $order->id) . '">
+                                    ' . csrf_field() . method_field('PATCH') . '
+                                    <select name="payment_status" class="form-select form-select-sm fw-bold mb-1" onChange="this.form.submit()">
+                                        <option value="pending" ' . ($order->payment_status === 'pending' ? 'selected' : '') . '>Belum Dibayar</option>
+                                        <option value="paid" ' . ($order->payment_status === 'paid' ? 'selected' : '') . '>Sudah Dibayar</option>
+                                    </select>
+                                </form>
+                            </div>
+                        ';
+                    }
+                    return '<div class="text-center"><span class="fw-bold text-' . ($color[$order->payment_status] ?? 'dark') . '">' . ($label[$order->payment_status] ?? $order->payment_status) . '</span></div>';
                 })
                 ->addColumn('status_pesanan', function ($order) {
                     $statusLabels = [
@@ -132,14 +163,19 @@ class OrderController extends Controller
                         'completed'  => ['label' => 'Selesai', 'color' => 'success'],
                         'cancelled'  => ['label' => 'Dibatalkan', 'color' => 'danger'],
                     ];
+
+                    $labelText = $statusLabels[$order->status]['label'] ?? $order->status;
+                    $labelColor = $statusLabels[$order->status]['color'] ?? 'secondary';
+
+                    $html = '<div class="mb-1"><span class="fw-bold text-' . $labelColor . '">' . $labelText . '</span></div>';
                     
-                    $html = '<form action="' . route('admin.orders.updateStatus', $order->id) . '" method="POST">'
+                    $html = '<form action="' . route('admin.orders.updateStatus', $order->id) . '" method="POST" class="status-form">'
                         . csrf_field() . method_field('PATCH')
-                        . '<select name="status" class="form-select form-select-sm text-white bg-' . ($statusLabels[$order->status]['color'] ?? 'secondary') . '" onchange="this.form.submit()">';
+                        . '<select name="status" class="form-select form-select-sm fw-bold status-select text-' . $labelColor . '" data-initial="' . $order->status . '" onchange="updateSelectColor(this); this.form.submit();">';
                         
                     foreach ($statusLabels as $value => $data) {
                         $selected = $order->status === $value ? 'selected' : '';
-                        $html .= '<option class="bg-' . $data['color'] . '" value="' . $value . '" ' . $selected . '>' . $data['label'] . '</option>';
+                        $html .= '<option class="text-' . $data['color'] . '" value="' . $value . '" ' . $selected . '>' . $data['label'] . '</option>';
 
                     }
                     $html .= '</select></form>';
@@ -158,23 +194,20 @@ class OrderController extends Controller
                 ->addColumn('aksi', function ($order) {
                     $html = '<div class="d-flex flex-wrap gap-2">';
 
-                    // if ($order->payment_status === 'paid') {
-                    //     $html .= ' <a href="' . route('admin.orders.print', $order->id) . '" target="_blank" class="btn btn-success btn-sm">Cetak Struk</a>';
-                    // }
-                    
-                    $html .= '<a href="' . route('admin.orders.print', $order->id) . '" target="_blank" class="btn btn-secondary btn-sm">'
-                        . '<i class="fas fa-print"></i> Cetak Struk</a>';
+                    if ($order->payment_status === 'paid' && $order->status === 'completed') {                   
+                        $html .= '<a href="' . route('admin.orders.print', $order->id) . '" target="_blank" class="btn btn-success btn-sm">'
+                            . '<i class="fas fa-print"></i> Cetak Struk</a>';
 
                     // $html .= '<form action="' . route('admin.orders.destroy', $order->id) . '" method="POST" class="d-inline">'
                     //     . csrf_field() . method_field('DELETE')
                     //     . '<button type="submit" class="btn btn-danger btn-sm">Hapus</button>'
                     //     . '</form>';
-      
+                    }
                     $html .= '</div>';
                                     
                     return $html;
                 })
-                ->rawColumns(['catatan', 'status_pembayaran', 'status_pesanan', 'aksi'])
+                ->rawColumns(['catatan', 'status_pembayaran', 'status_pesanan', 'aksi', 'payment_status'])
                 ->make(true);
         }
 
