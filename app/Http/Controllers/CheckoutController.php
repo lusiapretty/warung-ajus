@@ -51,7 +51,7 @@ class CheckoutController extends Controller
             ], 422);
         }
 
-        $orderId = 'ORDER-' . Str::uuid();
+        $orderId = 'ORDER-' . strtoupper(Str::random(6));
 
         // Simpan Order
         $order = Order::create([

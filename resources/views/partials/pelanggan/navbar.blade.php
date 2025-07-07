@@ -85,6 +85,9 @@
       <div class="modal-body">
         <!-- Form Pelanggan -->
         <form id="checkoutForm">
+          <!-- Ringkasan Keranjang -->
+            <h5 class="fw-bold">Detail Pesanan:</h5>
+            <div id="checkoutSummary" class="checkout-summary"></div>
           <div class="mb-3">
             <label for="tipe-pesanan" class="form-label">Tipe Pesanan</label>
             <select id="tipe_pesanan" class="form-select" onchange="toggleCheckoutFields()" required>
@@ -103,11 +106,14 @@
               <option disabled selected>-- Pilih No Meja --</option>
             </select>
           </div>
-
-          <!-- Ringkasan Keranjang -->
-          <h5 class="fw-bold mt-4">Detail Pesanan:</h5>
-          <div id="checkoutSummary" class="checkout-summary"></div>
-
+          <div class="mb-3">
+            <label for="pembayaran" class="form-label">Metode Pembayaran</label>
+            <select class="form-select" id="pembayaran" required>
+              <option value="" disabled selected>-- Pilih Metode Pembayaran --</option>
+              <option value="cash">Cash</option>
+              <option value="midtrans">Bayar Online</option>
+            </select>
+          </div>
         </form>    
       </div>
       <div class="modal-footer justify-content-between">
@@ -415,14 +421,16 @@ const baseAssetUrl = "{{ asset('img') }}/";
       const tipe_pesanan = document.getElementById('tipe_pesanan').value;
       const nama = document.getElementById('nama_pelanggan').value;
       const no_meja = document.getElementById('no_meja').value;
+      const pembayaran = document.getElementById('pembayaran').value;
 
       const cart = JSON.parse(storage.getItem(cartKey)) || [];
 
-      if (!tipe_pesanan || !nama || (tipe_pesanan === 'dine_in' && !no_meja)) {
-        alert("Mohon lengkapi semua data pelanggan.");
+      if (!tipe_pesanan || !nama || !pembayaran || (tipe_pesanan === 'dine_in' && !no_meja)) {
+        alert("Mohon lengkapi semua data pelanggan dan pilih metode pembayaran.");
         return;
       }
 
+      const generatedOrderId = 'ORDER-' + Date.now(); 
       let grandTotal = 0;
       cart.forEach(item => {
         const basePrice = Number(item.basePrice || 0);
@@ -430,13 +438,12 @@ const baseAssetUrl = "{{ asset('img') }}/";
         grandTotal += (basePrice + addonTotal) * (item.quantity || 1);
       });
 
-    const generatedOrderId = 'ORDER-' + Date.now(); 
-
     const payload = {
       order_id: generatedOrderId,
       nama_pelanggan: nama,
       tipe_pesanan,
       no_meja: tipe_pesanan === 'dine_in' ? no_meja : null,
+      pembayaran,
       menu: cart.map(item => ({
         menu_id: item.menu_id,
         basePrice: item.basePrice,
@@ -446,82 +453,112 @@ const baseAssetUrl = "{{ asset('img') }}/";
       }))
     };
 
+    if (pembayaran === 'cash') {
+      fetch('/checkout', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        Swal.fire({
+          title: 'Pesanan Berhasil!',
+          text: 'Pesanan Anda telah dibuat dan akan segera diproses.',
+          icon: 'success',
+          confirmButtonText: 'Lihat Pesanan Saya'
+        }).then(() => {
+          storage.removeItem(cartKey);
+          updateCartCount();
+          loadCart();
+          window.location.href = '/pesanan-saya';
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Terjadi kesalahan saat membuat pesanan.");
+      });
+    } else {
+
     // console.log('Payload yang dikirim:', JSON.stringify(payload, null, 2));
 
     // console.log('Cart:', cart);
 
     // Panggil endpoint untuk ambil snap token Midtrans
-    fetch('/midtrans/token', {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      },
-      body: JSON.stringify(payload)
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.snap_token) {
-        snap.pay(data.snap_token, {
-            onSuccess: function(result) {
-            // Setelah pembayaran berhasil, simpan order
-            const simpanPayload = {
-              order_id: generatedOrderId,
-              nama_pelanggan: nama,
-              tipe_pesanan,
-              no_meja: tipe_pesanan === 'dine_in' ? no_meja : null,
-              total: grandTotal,
-              menu: cart
-            };
 
-           fetch('/simpan-order', {
-              method: 'POST',
-              headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-              },
-              body: JSON.stringify(simpanPayload)
-            })
-            .then(res => {
-              if (!res.ok) {
-                return res.text().then(errText => {
-                  console.error("Response bukan JSON:", errText);
-                  throw new Error("Gagal menyimpan pesanan.");
-                });
-              }
-              return res.json();
-            })
-            .then(data => {
-              storage.removeItem(cartKey);
-              updateCartCount();
-              loadCart();
-              window.location.href = '/';
-            })
-            .catch(err => {
-              console.error(err);
-              alert("Pesanan berhasil dibayar, tapi gagal disimpan. Hubungi admin.");
-            });
+      // Midtrans
+      fetch('/midtrans/token', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.snap_token) {
+          snap.pay(data.snap_token, {
+              onSuccess: function(result) {
+              // Setelah pembayaran berhasil, simpan order
+              const simpanPayload = {
+                order_id: generatedOrderId,
+                nama_pelanggan: nama,
+                tipe_pesanan,
+                no_meja: tipe_pesanan === 'dine_in' ? no_meja : null,
+                total: grandTotal,
+                menu: cart
+              };
 
-          },
+            fetch('/simpan-order', {
+                method: 'POST',
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(simpanPayload)
+              })
+              .then(res => {
+                if (!res.ok) {
+                  return res.text().then(errText => {
+                    console.error("Response bukan JSON:", errText);
+                    throw new Error("Gagal menyimpan pesanan.");
+                  });
+                }
+                return res.json();
+              })
+              .then(data => {
+                storage.removeItem(cartKey);
+                updateCartCount();
+                loadCart();
+                window.location.href = '/pesanan-saya';
+              })
+              .catch(err => {
+                console.error(err);
+                alert("Pesanan berhasil dibayar, tapi gagal disimpan. Hubungi admin.");
+              });
 
-          onPending: function(result) {
-            alert("Transaksi belum selesai. Silahkan selesaikan pembayaran.");
-          },
-          onError: function(result) {
-            alert("Gagal melakukan pembayaran. Silahkan coba lagi.");
-          },
-          onClose: function() {
-            alert("Kamu menutup popup tanpa menyelesaikan pembayaran.");
-          }
-        });
-      } else {
-        alert("Gagal mengambil token. Silahkan coba lagi.");
-      }
-    })
-
-    .catch(error => {
-      alert("Terjadi kesalahan saat mengirim pesanan.");
-    });
+            },
+            onPending: function(result) {
+              alert("Transaksi belum selesai. Silahkan selesaikan pembayaran.");
+            },
+            onError: function(result) {
+              alert("Gagal melakukan pembayaran. Silahkan coba lagi.");
+            },
+            onClose: function() {
+              alert("Kamu menutup popup tanpa menyelesaikan pembayaran.");
+            }
+          });
+        } else {
+          alert("Gagal mengambil token. Silahkan coba lagi.");
+        }
+      })
+      .catch(error => {
+        alert("Terjadi kesalahan saat mengirim pesanan.");
+      });
+    }
   });
 
   // Fungsi untuk memperbarui angka keranjang

@@ -280,6 +280,32 @@ $(document).ready(function () {
 
 </script>
 
+<script>
+    function updateSelectColor(selectElement) {
+        const statusColors = {
+            'pending': 'text-warning',
+            'processing': 'text-primary',
+            'completed': 'text-success',
+            'cancelled': 'text-danger'
+        };
+
+        // Hapus semua class text-* sebelumnya
+        selectElement.classList.remove('text-warning', 'text-primary', 'text-success', 'text-danger');
+
+        // Tambahkan class baru sesuai value yang dipilih
+        const selectedValue = selectElement.value;
+        const newClass = statusColors[selectedValue] || 'text-secondary';
+        selectElement.classList.add(newClass);
+    }
+
+    // Jalankan saat halaman dimuat untuk inisialisasi
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.status-select').forEach(select => {
+            updateSelectColor(select);
+        });
+    });
+</script>
+
 <div class="pc-content" style="display:none;"></div>
 <div class="footer-wrapper" style="display:none;"></div>
 
