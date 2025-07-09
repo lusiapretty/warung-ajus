@@ -1,6 +1,42 @@
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <!-- Footer -->
-<footer id="kontak">
-    <div class="footer-item">📍 Alamat <br> Jl. Goa gong No.3 Jimbaran</div>
-    <div class="footer-item">⏰ Jam Operasional <br> Senin - Sabtu: 08.00 - 16.00</div>
-    <div class="footer-item">📞 No Telp <br> 087887920415 </div>
+<footer class="footer">
+  <div class="footer-container">
+
+    <!-- Logo & Deskripsi -->
+    <div class="footer-section">
+      <img src="{{ asset('img/logo-warung.png') }}" alt="Logo Warung Ajus" class="footer-logo">
+      <p class="footer-desc">Jl. Goa Gong No. 3, Bukit Jimbaran<br>Depan ATM Sepeda Motor</p>
+    </div>
+
+    <!-- Navigasi -->
+    <div class="footer-section">
+      <h3>Informasi</h3>
+      <ul class="footer-links">
+        <li><a href="/">Beranda</a></li>
+        <li><a href="{{ route('tentang')}}">Tentang Kami</a></li>
+        <li><a href="{{ route('menu.makanan')}}">Menu</a></li>
+        <li><a href="{{ route('home')}}">Kontak</a></li>
+      </ul>
+    </div>
+
+    <!-- Sosial Media -->
+    <div class="footer-section">
+      <h3>Ikuti Kami</h3>
+      <ul class="footer-social">
+        <li>
+          <a href="https://instagram.com/warungajus" target="_blank">
+            <i class="fab fa-instagram"></i> @warungajus.id
+          </a>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    &copy; {{ date('Y') }} Warung Ajus.
+  </div>
 </footer>

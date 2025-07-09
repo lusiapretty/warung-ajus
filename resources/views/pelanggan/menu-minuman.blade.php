@@ -4,16 +4,11 @@
 
 @section('content')
 
-  <!-- Hero Section -->
-  <div class="hero-section">
-    <h1>MENU KAMI</h1>
-  </div>
-
-  <!-- Menu Section -->
+   <!-- Menu Section -->
   <section class="menu-section">
     <div class="filter-buttons">
-        <a href="{{ route('menu.makanan')}}" class="filter-btn ">MAKANAN</a>
-        <a href="{{ route('menu.minuman')}}" class="filter-btn active">MINUMAN</a>    
+       <a href="{{ route('menu.makanan') }}" class="filter-btn ">MAKANAN</a>
+       <a href="{{ route('menu.minuman') }}" class="filter-btn active">MINUMAN</a> 
     </div>
 
     <div class="menu-grid">

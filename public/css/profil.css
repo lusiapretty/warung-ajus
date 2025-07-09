@@ -1,3 +1,5 @@
+/* profil.css */
+
 /* Pastikan html dan body mengambil seluruh tinggi viewport */
 html, body {
   height: 100%;
@@ -9,6 +11,7 @@ html, body {
 body {
   display: flex;
   flex-direction: column;
+  font-family: 'Poppins';
   background-color: #f7f9fc;
 }
 
@@ -22,14 +25,17 @@ main {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 60px 20px 100px;
-  background-color: #f0f2f5;
-  min-height: calc(100vh - 160px); /* Perkirakan tinggi navbar + footer */
+  padding: 200px 20px 100px; /* Padding top agar tidak tabrakan dengan navbar */
+   background-image: url('../img/hero-bg.jpg'); /* pastikan path-nya sesuai */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
 }
 
 /* Kartu profil */
 .profile-card {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.95); /* Transparansi agar latar terlihat */
   padding: 40px 30px;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -38,7 +44,7 @@ main {
   transition: all 0.3s ease-in-out;
 }
 
-/* Judul profil */
+/* Judul */
 .profile-title {
   font-size: 24px;
   margin-bottom: 30px;
@@ -55,13 +61,9 @@ main {
   border-radius: 6px;
   margin-bottom: 20px;
   font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
   border-left: 4px solid #28a745;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
-
 
 /* Grup form */
 .form-group {
@@ -107,5 +109,6 @@ main {
 }
 
 .btn-submit:hover {
+  background-color: #e6c300;
   background-color: #fffb00;
 }

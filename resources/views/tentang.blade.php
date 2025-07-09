@@ -9,8 +9,8 @@
 
 @section('content')
     <!-- INFORMASI UMKM -->
-    <section class="info-umkm" id="tentangkami" data-aos="fade-up">
-        <h3>Tentang Kami</h3>
+    <section class="info-umkm" id="tentangkami" >
+        <h3>Tentang Kami</h3><br>
         <p>
             Warung Ajus merupakan usaha kuliner yang bergerak di bidang penyediaan makanan Indonesia. 
             Didirikan pada tahun 2012, Warung Ajus hadir dengan tujuan untuk menghadirkan cita rasa autentik 
@@ -47,7 +47,7 @@
             <!-- Cabang 1 -->
             <div class="cabang-card" data-aos="fade-up">
                 <a href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3942.848616815192!2d115.17131780000001!3d-8.800289500000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd244bbfe6b20fb%3A0xa1f6fe393df8f8a5!2sWarung%20Ajus!5e0!3m2!1sen!2sid!4v1747168588305!5m2!1sen!2sid" target="_blank">
-                    <img src="{{ asset('img/es-campur.png') }}" alt="Cabang 1">
+                    <img src="{{ asset('img/warung-ajus2.png') }}" alt="Cabang 1">
                 </a>
                 <h3>Cabang 1</h3>
                 <p>Fakultas MIPA, Universitas Udayana</p>
@@ -56,7 +56,7 @@
             <!-- Cabang 2 -->
             <div class="cabang-card" data-aos="fade-up">
                 <a href="https://www.google.com/maps?q=Jl.+Raya+Kampus+Unud+Jimbaran" target="_blank">
-                    <img src="{{ asset('img/soto-ayam.png') }}" alt="Cabang 2">
+                    <img src="{{ asset('img/warung-ajus3.png') }}" alt="Cabang 2">
                 </a>
                 <h3>Cabang 2</h3>
                 <p>Jl. Goa Gong No.3, Jimbaran</p>

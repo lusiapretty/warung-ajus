@@ -3,10 +3,6 @@
 @section('title', 'Menu - Warung Ajus')
 
 @section('content')
-<!-- Hero Section -->
-<div class="hero-section">
-  <h1>MENU KAMI</h1>
-</div>
 
 <!-- Menu Section -->
 <section class="menu-section">
