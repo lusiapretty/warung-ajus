@@ -71,6 +71,12 @@ class OrderController extends Controller
         }
 
         $order = Order::findOrFail($id);
+
+        // Jika status diubah menjadi 'cancelled', kosongkan nomor meja
+        if ($request->status === 'cancelled') {
+            $order->no_meja = null;
+        }
+        
         $order->status = $request->status;
         $order->save();
 
@@ -126,7 +132,43 @@ class OrderController extends Controller
                     0, ',', '.'
                 ))
                 ->addColumn('tipe_pesanan', fn($order) => $order->tipe_pesanan)
-                ->addColumn('no_meja', fn($order) => $order->no_meja ?? '-')              
+                ->addColumn('no_meja', function ($order) {
+                    // Tampilkan input nomor meja HANYA untuk dine_in
+                    $form = '';
+                    if ($order->tipe_pesanan === 'dine_in') {
+                        $form = '
+                            <form method="POST" action="' . route('admin.orders.updateNoMeja', $order->id) . '" class="d-flex align-items-center gap-2 no-meja-form" data-order-id="' . $order->id . '">
+                                ' . csrf_field() . method_field('PATCH') . '
+                                <input type="number" name="no_meja" class="form-control form-control-sm" value="' . ($order->no_meja ?? '') . '" style="width: 70px;" min="1">
+                                <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fas fa-save"></i></button>
+                            </form>';
+                    }
+
+                    // Jika no_meja ada dan pesanan dine in, cek apakah sedang terpakai
+                    $statusBadge = '';
+                    if ($order->no_meja && $order->tipe_pesanan === 'dine_in') {
+                        $isTerpakai = Order::where('no_meja', $order->no_meja)
+                            ->where('id', '!=', $order->id)
+                            ->where('tipe_pesanan', 'dine_in')
+                            ->where('payment_status', 'paid')
+                            ->whereIn('status', ['pending', 'processing'])
+                            ->whereNotNull('no_meja')
+                            ->exists();
+
+                        if ($isTerpakai) {
+                            $statusBadge = '<span class="badge bg-danger ms-2">Terpakai</span>';
+                        }
+                    }
+
+                    return '
+                        <div class="d-flex flex-column gap-1">
+                            ' . $form . '
+                            <div class="d-flex justify-content-start align-items-center gap-2">'
+                                . $statusBadge .
+                            '</div>
+                        </div>';
+                })
+
                 ->addColumn('payment_status', function ($order) {
                     $label = [
                         'pending' => 'Belum Dibayar',
@@ -207,7 +249,7 @@ class OrderController extends Controller
                                     
                     return $html;
                 })
-                ->rawColumns(['catatan', 'status_pembayaran', 'status_pesanan', 'aksi', 'payment_status'])
+                ->rawColumns(['catatan', 'status_pembayaran', 'status_pesanan', 'aksi', 'payment_status', 'no_meja'])
                 ->make(true);
         }
 
@@ -216,23 +258,41 @@ class OrderController extends Controller
 
     public function getMejaTerpakai()
     {
-        $limitWaktu = Carbon::now()->subMinutes(90); // batas waktu 90 menit
-
         $mejaTerpakai = Order::where('tipe_pesanan', 'dine_in')
-            ->where(function ($query) use ($limitWaktu) {
-                $query->where('status', 'processing') // pesanan aktif
-                ->orWhere(function ($q) use ($limitWaktu) {
-                    $q->where('status', 'completed') // pesanan selesai
-                      ->where('updated_at', '>=', $limitWaktu); // tapi belum lewat 90 menit
-                });
-            })
-            ->whereNotNull('no_meja') 
+            ->whereIn('status', ['pending', 'processing']) // hanya pesanan aktif
+            ->whereNotNull('no_meja') // yang sudah diberi nomor meja
             ->pluck('no_meja')
-            ->map(fn($meja) => (int)$meja) 
-            ->unique() 
-            ->values(); 
+            ->map(fn($meja) => (int)$meja)
+            ->unique()
+            ->values();
 
         return response()->json(['meja_terpakai' => $mejaTerpakai]);
+    }
+
+    public function updateNoMeja(Request $request, Order $order)
+    {
+        $request->validate([
+            'no_meja' => 'nullable|integer|min:1'
+        ]);
+
+        if ($request->no_meja) {
+            $mejaTerpakai = Order::where('no_meja', $request->no_meja)
+                ->where('id', '!=', $order->id) // pengecualian: pesanan ini sendiri
+                ->where('tipe_pesanan', 'dine_in')
+                ->where('payment_status', 'paid') // hanya yang sudah dibayar
+                ->whereIn('status', ['pending', 'processing'])
+                ->whereNotNull('no_meja') 
+                ->exists();
+
+            if ($mejaTerpakai) {
+                return back()->with('error', 'Nomor meja sedang digunakan oleh pesanan aktif lain.');
+            }
+        }
+
+        $order->no_meja = $request->no_meja;
+        $order->save();
+
+        return back()->with('success', 'Nomor meja berhasil diperbarui.');
     }
 
     public function print(Order $order)

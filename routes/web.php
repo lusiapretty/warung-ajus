@@ -126,6 +126,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/orders/{id}/print', [OrderController::class, 'print'])->name('admin.orders.print');
     Route::get('/admin/orders/datatables', [OrderController::class, 'getDatatables'])->name('admin.orders.datatables');
     Route::get('/admin/orders/{order}', [AdminController::class, 'show'])->name('admin.orders.show');
+    Route::patch('/admin/orders/{order}/update-no-meja', [OrderController::class, 'updateNoMeja'])->name('admin.orders.updateNoMeja');
+
 
     Route::patch('/admin/orders/{order}/update-payment-status', [OrderController::class, 'updatePaymentStatus'])->name('admin.orders.updatePaymentStatus');
     Route::patch('/admin/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
