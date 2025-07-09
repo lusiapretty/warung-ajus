@@ -34,6 +34,10 @@
 .dataTables_length {
     margin-bottom: 10px;
 }
+
+.badge i.fas.fa-circle {
+    font-size: 0.5rem;
+}
 </style>
 
 <!-- Main Content -->
@@ -44,7 +48,7 @@
             {{-- <div class="mb-3 d-flex justify-content-between align-items-center card-body table-responsive p-0">  
                 <button class="btn btn-primary" data-toggle="modal" data-target="#createMenuModal">Tambah Pesanan</button>
             </div> --}}
-        
+
             <div class="card">
                 <div class="card-body">
                     <div class="row mb-3">
@@ -185,6 +189,11 @@
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+
+<!-- SweetAlert2 -->
+<link  href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
 {{-- 
 @php
     $ajaxUrl = route('admin.orders.datatables');
@@ -192,6 +201,75 @@
         $ajaxUrl = preg_replace("/^http:/", "https:", $ajaxUrl);
     }
 @endphp --}}
+
+<script>
+/**
+ *  type  : 'success' | 'error' | 'info' | 'warning' | 'question'
+ *  title : teks yang ingin ditampilkan
+ */
+function showToast(type, title){
+    Swal.fire({
+        // toast: true,
+        // position: 'top',      // pojok kanan‑atas; ubah ke 'top' jika mau di tengah atas
+        icon: type,
+        title: title,
+        showConfirmButton: false,
+        timer: 1400,              // 1,8 detik
+        timerProgressBar: true,
+        width: '400px',
+        position: 'center', 
+    });
+}
+</script>
+
+
+<script>
+$(document).on('submit', '.no-meja-form', function(e) {
+    e.preventDefault();
+
+    const form = $(this);
+    const orderId = form.data('order-id');
+    const actionUrl = form.attr('action');
+    const formData = form.serialize();
+
+    $.ajax({
+        url: actionUrl,
+        type: 'POST',
+        data: formData,
+        success: function () {
+            showToast('success', 'Nomor meja berhasil diperbarui');
+            $('#menu-table').DataTable().ajax.reload(null, false);  // refresh baris tanpa reload
+        },
+        error: function (xhr) {
+            const msg = xhr.responseJSON?.message || 'Gagal memperbarui nomor meja';
+            showToast('error', msg);
+        }
+    });
+});
+
+$(document).on('submit', '.status-form', function(e) {
+    e.preventDefault();
+    const form = $(this);
+    const actionUrl = form.attr('action');
+    const formData = form.serialize();
+
+    $.ajax({
+        url: actionUrl,
+        type: 'PATCH',
+        data: formData,
+        success: function () {
+            showToast('success', 'Status pesanan diperbarui');
+            $('#menu-table').DataTable().ajax.reload(null, false);
+        },
+        error: function (xhr) {
+            const msg = xhr.responseJSON?.message || 'Gagal mengubah status pesanan';
+            showToast('error', msg);
+        }
+    });
+});
+
+</script>
+
 
 <script>
 $(document).ready(function () {
@@ -308,6 +386,16 @@ $(document).ready(function () {
 
 <div class="pc-content" style="display:none;"></div>
 <div class="footer-wrapper" style="display:none;"></div>
+
+<script>
+@if(session('success'))
+    showToast('success', @json(session('success')));
+@endif
+
+@if(session('error'))
+    showToast('error', @json(session('error')));
+@endif
+</script>
 
 @endpush
 
