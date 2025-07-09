@@ -13,9 +13,26 @@
     vertical-align: middle;
 }
 
+#menu-table th,
+#menu-table td {
+    padding: 8px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+
 .badge {
     padding: 6px 12px;
     font-size: 13px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.dataTables_length {
+    margin-bottom: 10px;
 }
 </style>
 
@@ -52,30 +69,42 @@
                         <div class="col-md-3">
                             <input type="date" class="form-control" id="filter-tanggal">
                         </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="search-input" placeholder="Cari...">
+                        </div>
                     </div>
 
                     <div class="d-flex gap-2 mb-3">
-                        <a href="{{ route('admin.orders.export.pdf') }}" class="btn btn-danger">
-                            <i class="fas fa-file-pdf"></i> Export PDF</a>
-                        <button id="exportExcel" class="btn btn-success">
-                            <i class="fas fa-file-excel"></i> Export Excel</button>
+                        <button class="btn btn-danger" data-toggle="modal" data-target="#exportPdfModal">
+                            <i class="fas fa-file-pdf"></i> Export PDF
+                        </button>
+                        <button class="btn btn-success" data-toggle="modal" data-target="#exportExcelModal">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </button>
                     </div>
 
-                    <table class="table table-bordered" id="menu-table">
-                        <thead>
-                            <tr>
-                                <th>Order Id</th>
-                                <th>Nama Pelanggan</th>
-                                <th>Nama Menu</th>
-                                <th>Jumlah</th>
-                                <th>Catatan</th>
-                                <th>Total Harga</th>
-                                <th>Status Pembayaran</th>
-                                <th>Status Pesanan</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="menu-table">
+                            <thead>
+                                <tr>
+                                    <th>Order Id</th>
+                                    <th>Tanggal Order</th>
+                                    <th>Nama Pelanggan</th>
+                                    <th>Nama Menu</th>
+                                    <th>Jumlah</th>
+                                    <th>Catatan</th>
+                                    <th>Total Harga</th>
+                                    <th>Tipe Pesanan</th>
+                                    <th>No Meja</th>
+                                    <th>Status Pembayaran</th>
+                                    <th>Status Pesanan</th>
+                                    <th>Aksi</th>
+                                    <th style="display:none">Status Pesanan (Export)</th> 
+                                </tr>
+                            </thead>
+                        </table>
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -84,6 +113,60 @@
 
 <div class="pc-content" style="display:none;"></div>
 <div class="footer-wrapper" style="display:none;"></div>
+
+<!-- Modal Export PDF -->
+<div class="modal fade" id="exportPdfModal" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form id="pdfExportForm" method="GET" action="{{ route('admin.orders.export.pdf') }}">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Export PDF - Pilih Tanggal</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body row">
+                <div class="col-md-6">
+                    <label>Tanggal Mulai</label>
+                    <input type="date" class="form-control" name="start_date" required>
+                </div>
+                <div class="col-md-6">
+                    <label>Tanggal Akhir</label>
+                    <input type="date" class="form-control" name="end_date" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="submitExportPdf">Export PDF</button>
+            </div>
+        </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Export Excel -->
+<div class="modal fade" id="exportExcelModal" tabindex="-1" role="dialog" aria-labelledby="excelModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form id="excelExportForm" method="GET" action="{{ route('admin.orders.export.excel') }}">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Export Excel - Pilih Tanggal</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body row">
+                <div class="col-md-6">
+                    <label>Tanggal Mulai</label>
+                    <input type="date" class="form-control" name="start_date" required>
+                </div>
+                <div class="col-md-6">
+                    <label>Tanggal Akhir</label>
+                    <input type="date" class="form-control" name="end_date" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="submitExportExcel">Export Excel</button>
+            </div>
+        </div>
+    </form>
+  </div>
+</div>
 
 @endsection
 
@@ -102,6 +185,13 @@
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+{{-- 
+@php
+    $ajaxUrl = route('admin.orders.datatables');
+    if (request()->isSecure()) {
+        $ajaxUrl = preg_replace("/^http:/", "https:", $ajaxUrl);
+    }
+@endphp --}}
 
 <script>
 $(document).ready(function () {
@@ -114,28 +204,33 @@ $(document).ready(function () {
                 d.status_pembayaran = $('#filter-status-pembayaran').val();
                 d.status_pesanan = $('#filter-status-pesanan').val();
                 d.tanggal = $('#filter-tanggal').val();
+                d.search = { value: $('#search-input').val() }; 
             }
         },
-        dom: 'lfrtip',
+        dom: 'lrtip',
         buttons: [
             {
                 extend: 'excel',
                 title: 'Daftar Pesanan',
                 exportOptions: {
-                    columns: ':not(:last-child)'
+                    columns: [0,1,2,3,4,5,6,7,8,9,12]
                 }
             }
         ],
         columns: [
-            { data: 'id', name: 'id' },
-            { data: 'nama_pelanggan', name: 'nama_pelanggan' },
+            { data: 'order_id', name: 'order_id' },
+            { data: 'tanggal_order', name: 'tanggal_order' },
+            { data: 'nama_pelanggan', name: 'nama_pelanggan', orderable: false, },
             { data: 'nama_menu', name: 'nama_menu', orderable: false, searchable: false },
             { data: 'jumlah_total', name: 'jumlah_total', orderable: false, searchable: false },
             { data: 'catatan', name: 'catatan', orderable: false, searchable: false },
             { data: 'total_harga', name: 'total_harga', orderable: false, searchable: false },
-            { data: 'status_pembayaran', name: 'status_pembayaran', orderable: false, searchable: false },
-            { data: 'status_pesanan', name: 'status_pesanan', orderable: false, searchable: false },
+            { data: 'tipe_pesanan', name: 'tipe_pesanan', orderable: false, searchable: false },
+            { data: 'no_meja', name: 'no_meja', orderable: false, searchable: false },
+            { data: 'payment_status', name: 'payment_status', orderable: false, searchable: false},
+            { data: 'status_pesanan', name: 'status_pesanan', orderable: false, searchable: false, exportable: false},
             { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
+            { data: 'status_pesanan_export', name: 'status_pesanan_export', visible: false},
         ]
     });
 
@@ -144,10 +239,75 @@ $(document).ready(function () {
     });
 
     // Filter trigger
-    $('#filter-status-pembayaran, #filter-status-pesanan, #filter-tanggal').on('change', function () {
+    $('#filter-status-pembayaran, #filter-status-pesanan, #filter-tanggal, #search-input').on('change keyup', function () {
         table.draw();
     });
 });
+
+$(document).ready(function () {
+    $('#submitExportPdf').on('click', function () {
+        const form = $('#pdfExportForm');
+        const start = form.find('input[name="start_date"]').val();
+        const end = form.find('input[name="end_date"]').val();
+
+        if (!start || !end) {
+            alert('Harap isi tanggal mulai dan akhir.');
+            return;
+        }
+
+        $('#exportPdfModal').modal('hide'); // TUTUP MODAL DULU
+        setTimeout(() => {
+            window.location.href = `{{ route('admin.orders.export.pdf') }}?start_date=${start}&end_date=${end}`;
+        }, 500); // Beri delay 500ms agar modal benar-benar tertutup
+    });
+
+    $('#submitExportExcel').on('click', function () {
+        const form = $('#excelExportForm');
+        const start = form.find('input[name="start_date"]').val();
+        const end = form.find('input[name="end_date"]').val();
+
+        if (!start || !end) {
+            alert('Harap isi tanggal mulai dan akhir.');
+            return;
+        }
+
+        $('#exportExcelModal').modal('hide');
+        setTimeout(() => {
+            window.location.href = `{{ route('admin.orders.export.excel') }}?start_date=${start}&end_date=${end}`;
+        }, 500);
+    });
+});
+
 </script>
+
+<script>
+    function updateSelectColor(selectElement) {
+        const statusColors = {
+            'pending': 'text-warning',
+            'processing': 'text-primary',
+            'completed': 'text-success',
+            'cancelled': 'text-danger'
+        };
+
+        // Hapus semua class text-* sebelumnya
+        selectElement.classList.remove('text-warning', 'text-primary', 'text-success', 'text-danger');
+
+        // Tambahkan class baru sesuai value yang dipilih
+        const selectedValue = selectElement.value;
+        const newClass = statusColors[selectedValue] || 'text-secondary';
+        selectElement.classList.add(newClass);
+    }
+
+    // Jalankan saat halaman dimuat untuk inisialisasi
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.status-select').forEach(select => {
+            updateSelectColor(select);
+        });
+    });
+</script>
+
+<div class="pc-content" style="display:none;"></div>
+<div class="footer-wrapper" style="display:none;"></div>
+
 @endpush
 

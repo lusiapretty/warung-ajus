@@ -7,6 +7,7 @@ use Midtrans\Config;
 use Midtrans\Snap;
 use App\Models\Menu;
 use App\Models\Order;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -18,17 +19,19 @@ class PaymentController extends Controller
         Config::$isSanitized = config('midtrans.is_sanitized');
         Config::$is3ds = config('midtrans.is_3ds');
 
-        // Ambil data dari request
         $payload = $request->all();
 
-        $orderId = 'ORDER-' . uniqid();
+        if (!isset($payload['order_id'])) {
+            return response()->json(['error' => 'order_id diperlukan'], 422);
+        }
+
+        $orderId = $payload['order_id'];
+
         $items = [];
 
-        // Loop item cart
         foreach ($payload['menu'] as $item) {
-            
-             $menu = Menu::find($item['menu_id']);
-             $menuName = $menu ? $menu->nama_menu : 'Menu tidak ditemukan';
+            $menu = Menu::find($item['menu_id']);
+            $menuName = $menu ? $menu->nama_menu : 'Menu tidak ditemukan';
 
             $items[] = [
                 'id'       => $item['menu_id'],
@@ -52,7 +55,7 @@ class PaymentController extends Controller
         $totalHarga = array_reduce($items, function ($total, $item) {
             return $total + ($item['price'] * $item['quantity']);
         }, 0);
-        
+
         $params = [
             'transaction_details' => [
                 'order_id'     => $orderId,
@@ -67,18 +70,26 @@ class PaymentController extends Controller
 
         try {
             $snapToken = Snap::getSnapToken($params);
-            return response()->json(['snap_token' => $snapToken]);
+
+            // Kirim order_id ke frontend untuk disimpan saat checkout
+            return response()->json([
+                'snap_token' => $snapToken,
+                'order_id'   => $orderId
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
+
     public function handleNotification(Request $request)
     {
-        $orderId = $request->order_id;
-        $status = $request->transaction_status;
+        Log::info('Notifikasi Midtrans Masuk:', $request->all());
 
-        $order = Order::where('id', $orderId)->first();
+        $orderId = $request->input('order_id');
+        $status = $request->input('transaction_status');
+
+        $order = Order::where('order_id', $orderId)->first();
 
         if (!$order) return;
 
@@ -99,6 +110,9 @@ class PaymentController extends Controller
         }
 
         $order->save();
+
+        return response()->json(['message' => 'Notifikasi diproses']);
+
     }
 
 }

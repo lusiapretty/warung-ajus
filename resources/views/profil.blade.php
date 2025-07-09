@@ -2,10 +2,6 @@
 
 @section('title', 'Profil')
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/profil.css') }}">
-@endpush
-
 @section('content')
 <div class="profile-wrapper">
     <div class="profile-card">

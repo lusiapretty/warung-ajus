@@ -1,3 +1,44 @@
+<style>
+#menu-table {
+    width: 100% !important;
+    border-collapse: collapse;
+}
+
+#menu-table th, #menu-table td {
+    border: 1px solid #dee2e6 !important;
+    vertical-align: middle;
+    padding: 8px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+#menu-table td.wrap-text {
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 250px; /* bisa disesuaikan */
+}
+
+.badge {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.dataTables_length select {
+    padding-right: 24px; 
+    background-position: right center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20fill='gray'%20class='bi%20bi-caret-down-fill'%20viewBox='0%200%2016%2016'%3E%3Cpath%20d='M7.247%2011.14%202.451%205.658c-.566-.64-.106-1.658.753-1.658h9.592c.86%200%201.32%201.018.753%201.658L8.753%2011.14a1%201%200%200%201-1.506%200z'/%3E%3C/svg%3E");
+}
+</style>
+
 @extends('layouts.admin')
 
 @section('content')
@@ -10,10 +51,21 @@
             <div class="mb-3 d-flex justify-content-between align-items-center card-body table-responsive p-0">  
                 <button class="btn btn-primary" data-toggle="modal" data-target="#createMenuModal">Tambah Menu</button>
             </div>
+            
+             <!-- Filter Kategori -->
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <select class="form-control" id="filter-kategori">
+                        <option value="">Semua Kategori</option>
+                        <option value="makanan">Makanan</option>
+                        <option value="minuman">Minuman</option>
+                    </select>
+                </div>
+            </div>
         
             <div class="card">
-                <div class="card-body">
-                    <table class="table table-bordered" id="menu-table">
+                <div class="card-body table-responsive">
+                    <table class="table table-bordered table-striped" id="menu-table">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -83,7 +135,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="gambar">Gambar</label>
-                                <input type="file" class="form-control" name="gambar">
+                                <input type="file" class="form-control" name="gambar" id="gambar" required>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -97,11 +149,20 @@
     </section>
 </div>
 
-<!-- DataTables & SweetAlert -->
+<!-- CSS DataTables dan Bootstrap 4 theme -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- Bootstrap Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/2.1.5/css/dataTables.dataTables.min.css" rel="stylesheet">
+
+<!-- DataTables -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+
+<!-- SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script type="text/javascript">
@@ -113,50 +174,72 @@ $.ajaxSetup({
 
 $(document).ready(function () {
     // $.noConflict();
-    $('#menu-table').DataTable({
+    var table = $('#menu-table').DataTable({
         processing: true,
         serverSide: true,
+        responsive: true,
+        order: [],
+        dom: '<"top d-flex justify-content-between align-items-center mb-3"l f>' +
+             'rt' +
+             '<"bottom d-flex justify-content-between align-items-center mt-2"i p>',
         ajax: {
             url: "{{ route('admin.menu.index') }}",
-            type: 'GET'
+            type: 'GET',
+            data: function(d) {
+                d.kategori = $('#filter-kategori').val();
+            }
         },
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'nama_menu', name: 'nama_menu' },
-            { 
-                data: 'addons', 
-                name: 'addons', 
-                orderable: false, 
-                searchable: false, 
-            },
-            { data: 'deskripsi', name: 'deskripsi' },
-            { data: 'harga', name: 'harga' },
-            { data: 'kategori', name: 'kategori' },
-            { data: 'gambar', name: 'gambar'},
+            { data: 'addons', name: 'addons', orderable: false, searchable: false, className: 'wrap-text'},
+            { data: 'deskripsi', name: 'deskripsi', orderable: false, className: 'wrap-text' },
+            { data: 'harga', name: 'harga', orderable: false },
+            { data: 'kategori', name: 'kategori', orderable: false },
+            { data: 'gambar', name: 'gambar', orderable: false},
             { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
-        ]   
+        ],
+        columnDefs: [
+            {
+                targets: 0,
+                orderable: false,
+                className: 'no-sort'
+            }
+        ]  
         }); 
+
+        // Trigger filter
+        $('#filter-kategori').on('change', function () {
+            table.draw();
+        });
 
     // Create Menu
     $('#create-menu-form').on('submit', function (e) {
         e.preventDefault();
 
-         console.log('🧪 Mode:', $('#create-menu-form input[name="_method"]').val());
-
-
         var form = $(this);
         var formData = new FormData(this);
-        var actionUrl = form.attr('action');
-        var method = form.find('input[name="_method"]').val() || 'POST';
-        
-        for (var pair of formData.entries()) {
-            console.log(pair[0]+ ': ' + pair[1]);
-        }
+        formData.append('_token', $('meta[name="csrf-token"]').attr('content')); 
 
+         if ($('#create-menu-form input[name="_method"]').val() === 'PUT') {
+            formData.append('_method', 'PUT');
+        }
+        var actionUrl = form.attr('action');
+        var method = 'POST';
+
+        var gambarFile = $('#gambar')[0].files[0];
+        // for (var pair of formData.entries()) {
+        //     console.log(pair[0]+ ': ' + pair[1]);
+        // }
+
+        if (!gambarFile) {
+            alert('Gambar belum dipilih!');
+            return;
+        }
 
         $.ajax({
             url: actionUrl,
-            method: 'POST',
+            method: method,
             data: formData,
             dataType: "json",
             contentType: false,
@@ -164,7 +247,6 @@ $(document).ready(function () {
             success: function(response) {
                 console.log("Respons dari server:", response);
                 console.log("AJAX success:", response);
-
 
                 if(response.success) {
                     console.log('Menjalankan modal hide...');
@@ -288,7 +370,7 @@ $(document).ready(function () {
             $('#create-menu-form').trigger('reset');
             $('#createMenuModalLabel').text('Tambah Menu');
             $('#create-menu-form').attr('action', '/admin/menu/store');
-            $('#create-menu-form input[name="_method"]').remove(); // hapus input method PUT kalau ada
+            $('#create-menu-form input[name="_method"]').remove();
         }
     });
 });

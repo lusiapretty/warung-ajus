@@ -23,22 +23,6 @@ use App\Http\Controllers\PelangganController;
 |--------------------------------------------------------------------------
 */
 
-// ===== Public Routes (Pelanggan) =====
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/tentang', [PageController::class, 'tentang'])->name('tentang');
-Route::get('/menu', [PageController::class, 'menu'])->name('menu.pelanggan');
-Route::get('/pesan', [PageController::class, 'pesan']);
-Route::get('/menu-makanan', [MenuController::class, 'indexMakanan'])->name('menu.makanan');
-Route::get('/menu-minuman', [MenuController::class, 'indexMinuman'])->name('menu.minuman');
-// Route::post('/checkout', [OrderController::class, 'store'])->name('checkout');
-Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
-Route::post('/simpan-order', [CheckoutController::class, 'storeFromMidtrans'])->name('order.storeFormMidtrans');
-Route::post('/midtrans/token', [PaymentController::class, 'createSnapToken'])->name('midtrans.token');
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/profil', [ProfileController::class, 'edit'])->name('profil.edit');
-    Route::post('/profil', [ProfileController::class, 'update'])->name('profil.update');
-});
 
 // ===== Auth Routes =====
 // Login
@@ -91,10 +75,26 @@ Route::post('/reset-password', function (Request $request) {
         : back()->withErrors(['email' => [__($status)]]);
 })->middleware('guest')->name('password.update');
 
-// ===== Pelanggan Route =====
+// ===== Public Routes (Pelanggan) =====
 Route::middleware(['auth', 'role:pelanggan'])->get('/home', function () {
     return view('home');
 })->name('pelanggan.home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/tentang', [PageController::class, 'tentang'])->name('tentang');
+Route::get('/menu', [PageController::class, 'menu'])->name('menu.pelanggan');
+Route::get('/pesan', [PageController::class, 'pesan']);
+Route::get('/menu-makanan', [MenuController::class, 'indexMakanan'])->name('menu.makanan');
+Route::get('/menu-minuman', [MenuController::class, 'indexMinuman'])->name('menu.minuman');
+Route::get('/meja-terpakai', [OrderController::class, 'getMejaTerpakai']);
+Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout')->middleware('auth');
+Route::post('/simpan-order', [CheckoutController::class, 'storeFromMidtrans'])->name('order.storeFormMidtrans');
+Route::post('/midtrans/token', [PaymentController::class, 'createSnapToken'])->name('midtrans.token');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profil', [ProfileController::class, 'edit'])->name('profil.edit');
+    Route::post('/profil', [ProfileController::class, 'update'])->name('profil.update');
+    Route::get('/pesanan-saya', [OrderController::class, 'pesananSaya'])->name('pesanan.saya');
+});
 
 // ===== Admin Routes =====
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -116,8 +116,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::put('/admin/addons/update/{id}', [AddonController::class, 'update'])->name('admin.addons.update');
     Route::delete('/admin/addons/{id}', [AddonController::class, 'destroy'])->name('admin.addons.destroy');
 
-
-    //PELANGGAN
+    //Pelanggan Routes
     Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan.index');
 
     // Pesanan Pelanggan Routes
@@ -126,11 +125,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/admin/orders/{id}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
     Route::get('/admin/orders/{id}/print', [OrderController::class, 'print'])->name('admin.orders.print');
     Route::get('/admin/orders/datatables', [OrderController::class, 'getDatatables'])->name('admin.orders.datatables');
+    Route::get('/admin/orders/{order}', [AdminController::class, 'show'])->name('admin.orders.show');
 
+    Route::patch('/admin/orders/{order}/update-payment-status', [OrderController::class, 'updatePaymentStatus'])->name('admin.orders.updatePaymentStatus');
     Route::patch('/admin/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 
     Route::get('/admin/orders/print/{order}', [OrderController::class, 'print'])->name('admin.orders.print');
     Route::get('/admin/orders/export/pdf', [OrderController::class, 'exportPdf'])->name('admin.orders.export.pdf');
+    Route::get('/admin/orders/export/excel', [OrderController::class, 'exportExcel'])->name('admin.orders.export.excel');
 
-   });
+});
 

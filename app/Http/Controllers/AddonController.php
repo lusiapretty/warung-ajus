@@ -17,8 +17,14 @@ class AddonController extends Controller
                 ->addIndexColumn()
                 ->addColumn('aksi', function ($row) {
                     return '
-                        <button class="btn btn-sm btn-primary btn-edit" data-id="' . $row->id . '">Edit</button>
-                        <button class="btn btn-sm btn-danger btn-delete" data-id="' . $row->id . '">Hapus</button>
+                        <div class="d-flex gap-3">
+                            <button class="btn btn-sm btn-primary btn-edit" data-id="' . $row->id . '">
+                                <i class="fas fa-pen-alt"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-delete" data-id="' . $row->id . '">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
                     ';
                 })
                 ->rawColumns(['aksi'])

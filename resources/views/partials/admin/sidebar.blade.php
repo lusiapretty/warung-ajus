@@ -49,10 +49,13 @@
         </li>
         
         <li class="pc-item">
-          <a href="template/dist/pages/login.html" class="pc-link">
-            <span class="pc-micon"><i class="ti ti-logout"></i></span>
-            <span class="pc-mtext">Logout</span>
+          <a href="#" class="pc-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+              <span class="pc-micon"><i class="ti ti-logout"></i></span>
+              <span class="pc-mtext">Logout</span>
           </a>
+          <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+              @csrf
+          </form>
         </li>
       </ul>
     </div>

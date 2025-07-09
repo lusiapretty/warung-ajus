@@ -12,6 +12,12 @@ body {
   display: flex;
   flex-direction: column;
   font-family: 'Poppins';
+  background-color: #f7f9fc;
+}
+
+/* Konten utama profil */
+main {
+  flex: 1; /* Mengisi ruang kosong agar footer tetap di bawah */
 }
 
 /* Wrapper profil */
@@ -44,6 +50,7 @@ body {
   margin-bottom: 30px;
   color: #333;
   text-align: center;
+  font-weight: bold;
 }
 
 /* Alert sukses */
@@ -103,4 +110,5 @@ body {
 
 .btn-submit:hover {
   background-color: #e6c300;
+  background-color: #fffb00;
 }
