@@ -4,91 +4,189 @@
 @section('title', 'Beranda - Warung Ajus')
 
 @section('content')
-@if (session('success'))
-  <div id="alert-success" style="background-color: #d4edda; color: #155724; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; text-align: center;">
-    {{ session('success') }}
-  </div>
-
-  <script>
-    setTimeout(function () {
-      const alertBox = document.getElementById('alert-success');
-      if (alertBox) {
-        alertBox.style.transition = 'opacity 0.5s ease-out';
-        alertBox.style.opacity = '0';
-        setTimeout(() => alertBox.remove(), 500);
-      }
-    }, 1000);
-  </script>
-@endif
-
 <!-- Hero Section -->
-<section class="hero">
-  <div class="hero-bg-top"></div>
-  <div class="hero-bg-bottom"></div>
-  
-  <div class="hero-content">
-    <div class="hero-text">
-      <div class="hero-title" data-aos="fade-right">
-        <h1>Indonesia <br><span class="bold">Food</span> <span class="italic">Delicious</span></h1>
+<section class="hero" id="beranda" style="background-image: url('{{ asset('img/hero-bg.jpg') }}')">
+  <div class="hero-overlay"></div>
+  <div class="container hero-container">
+    
+    <!-- Kiri: Konten -->
+    <div class="hero-content">
+      <h1 class="hero-heading">Tipat Cantok ,<br> Satu Gigitan yang Berkesan</h1>
+      <p class="hero-description">
+        Tipat cantok adalah hidangan khas Bali yang mirip dengan gado-gado. Hidangan ini terdiri dari ketupat (tipat), 
+        sayuran rebus (seperti kacang panjang, tauge, dan kangkung), dan tahu goreng yang disiram dengan saus kacang yang
+        dihaluskan (cantok). 
+      </p>
+      <div class="hero-info">
+        <i class="fas fa-clock"></i>
+        <span>Buka: Senin – Jumat, 08.00 – 19.00</span>
+      </div>
+      <div class="hero-buttons">
+        <a href="{{ route('menu.makanan') }}" class="btn btn-outline">LIHAT MENU</a>
+      </div>
       </div>
 
-      <div class="hero-description" data-aos="fade-right">
-        <h3>Tipat Cantok</h3>
-        <p>
-          Salah satu menu favorit di Warung Ajus adalah Tipat Cantok. <br>
-          Tipat Cantok merupakan hidangan tradisional Bali yang menyerupai gado-gado,
-          terdiri dari ketupat (tipat) dan sayuran rebus yang disiram dengan bumbu kacang.
-          Kata 'cantok' sendiri merujuk pada proses mengulek bumbu.
-        </p>
-      </div>
-    </div>
+    <!-- Kanan: Gambar -->
+    <figure class="hero-banner">
+      <img src="{{ asset('img/hero-banner-bg.png') }}" alt="" class="hero-img-bg">
+      <img src="{{ asset('img/tipat-cantok.png') }}" alt="Tipat Cantok" class="hero-img">
+    </figure>
 
-    <div class="hero-images" data-aos="zoom-in-up">
-      <img src="{{ asset('img/tipat-cantok.png') }}" alt="Tipat Cantok">
-    </div>
   </div>
 </section>
+
+
+
+
+
 
 <!-- Menu Favorit -->
-<section class="menu-favorit-card" id="menu">
-  <div class="card-menu" data-aos="fade-up">
-    <h2 class="menu-title">Menu Favorit</h2>
-    <div class="menu-list">
-      <div class="menu-item">
+<section class="menu-favorit-modern" id="menu">
+  <h2 class="menu-title">Menu Favorit</h2>
+  <div class="menu-cards">
+    <!-- Item 1 -->
+    <div class="menu-card">
+      <div class="menu-image">
         <img src="{{ asset('img/rujak-kuah-pindang.png') }}" alt="Rujak Kuah Pindang">
-        <p class="menu-desc">Rujak Kuah Pindang</p>
       </div>
-      <div class="menu-item">
+      <div class="menu-body">
+        <h3 class="menu-name">Rujak Kuah Pindang</h3>
+        <p class="menu-desc">Buah segar dengan kuah pindang khas Bali.</p>
+      </div>
+    </div>
+
+    <!-- Item 2 -->
+    <div class="menu-card">
+      <div class="menu-image">
         <img src="{{ asset('img/es-campur.png') }}" alt="Es Campur">
-        <p class="menu-desc">Es Campur</p>
       </div>
-      <div class="menu-item">
+      <div class="menu-body">
+        <h3 class="menu-name">Es Campur</h3>
+        <p class="menu-desc">Es segar campuran buah dan sirup manis.</p>
+      </div>
+    </div>
+
+    <!-- Item 3 -->
+    <div class="menu-card">
+      <div class="menu-image">
         <img src="{{ asset('img/soto-ayam.png') }}" alt="Soto Ayam">
-        <p class="menu-desc">Soto Ayam</p>
       </div>
-      <div class="menu-item">
-        <img src="{{ asset('img/nasi-campur.png') }}" alt="Nasi Campur">
-        <p class="menu-desc">Nasi Campur</p>
+      <div class="menu-body">
+        <h3 class="menu-name">Soto Ayam</h3>
+        <p class="menu-desc">Soto ayam gurih lengkap dengan telur dan sambal.</p>
+      </div>
+    </div>
+
+    <!-- Item 4 -->
+    <div class="menu-card">
+      <div class="menu-image">
+        <img src="{{ asset('img/nasi-campur1.jpg') }}" alt="Nasi Campur">
+      </div>
+      <div class="menu-body">
+        <h3 class="menu-name">Nasi Campur</h3>
+        <p class="menu-desc">Nasi dengan berbagai lauk khas Bali lengkap.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Info UMKM -->
-<section class="info-umkm" id="tentangkami">
-  <div class="info-right" data-aos="fade-right">
-    <h3>INFORMASI UMKM</h3>
-    <p>Warung Ajus merupakan salah satu Usaha Mikro, Kecil, dan Menengah (UMKM)
-      yang telah beroperasi sejak tahun 2012. Warung Ajus memiliki target pasar yang luas,
-      mencakup semua kalangan yang ingin berbelanja, namun lebih berfokus pada pekerja dan mahasiswa.
-      Oleh karena itu, Warung Ajus menerapkan harga yang terjangkau bagi pelanggannya.
-    </p>
-    <a href="{{ route('tentang') }}" class="btn-selengkapnya">Selengkapnya</a>
-  </div>
-  <div class="info-left" data-aos="zoom-in-up">
-    <img src="{{ asset('img/logo-warung.png') }}" alt="Logo Warung" class="logo-warung">
+<!-- TENTANG KAMI -->
+<section class="tentang-kami-elegan" id="tentangkami" data-aos="fade-up">
+  <div class="tentang-container-elegan">
+    <!-- Kiri: Teks -->
+    <div class="tentang-konten-elegan">
+      <h2>Tentang Kami</h2>
+      <p class="tentang-subjudul">Cita rasa autentik Bali sejak 2012.</p>
+      <p>
+        Warung Ajus merupakan usaha kuliner yang bergerak di bidang penyediaan makanan khas Indonesia, terutama hidangan Bali.
+        Sejak berdiri tahun 2012, kami hadir untuk menghadirkan pengalaman makan yang ramah, nikmat, dan terjangkau bagi seluruh kalangan.
+        Komitmen kami terletak pada kualitas, kebersihan, dan pelayanan terbaik.
+      </p>
+
+      <div class="kutipan-tentang">
+        <img src="{{ asset('img/logo-warung.png') }}" alt="Logo Warung Ajus" class="logo-mini">
+        <div>
+          <p class="quote-tentang">
+            "Masakan adalah bahasa yang menyatukan rasa, budaya, dan kehangatan keluarga."
+          </p>
+          <p class="quote-author">– Warung Ajus</p>
+        </div>
+      </div>
+
+      <!-- Tombol Selengkapnya -->
+      <div style="max-width: 100%;">
+        <a href="{{ route('tentang') }}" class="btn-selengkapnya">Selengkapnya</a>
+      </div>
+    </div>
+
+    <!-- Kanan: Gambar Bertumpuk -->
+    <div class="tentang-gambar-elegan">
+      <div class="gambar-utama">
+        <img src="{{ asset('img/warung-ajus1.png') }}" alt="Gambar Warung">
+        <div class="est-tahun">Est.<br>2012</div>
+      </div>
+     </div>
   </div>
 </section>
+
+
+<!-- === SECTION LOKASI KAMI === -->
+<section class="lokasi-section" id="lokasi-kami">
+  <div class="lokasi-heading">
+    <h2>Lokasi Kami</h2>
+    <p>Kunjungi lokasi Warung Ajus atau hubungi kami untuk informasi lebih lanjut.</p>
+  </div>
+
+  <div class="lokasi-wrapper">
+    <!-- MAP -->
+    <div class="lokasi-map">
+       <iframe 
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3942.848616815192!2d115.17131780000001!3d-8.800289500000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd244bbfe6b20fb%3A0xa1f6fe393df8f8a5!2sWarung%20Ajus!5e0!3m2!1sen!2sid!4v1751600787059!5m2!1sen!2sid"
+    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+  </iframe>
+    </div>
+    
+
+    <!-- KONTAK -->
+    <div class="lokasi-info-box">
+      <h3 class="lokasi-title">Hubungi Kami</h3>
+      <p class="lokasi-subtitle">Kunjungi kami hari ini</p>
+
+      <div class="lokasi-item">
+        <i class="fas fa-map-marker-alt"></i>
+        <div>
+          <strong>Alamat</strong>
+          <p>Jln. Goa Gong No. 3, Bukit Jimbaran, Kampus UNUD</p>
+        </div>
+      </div>
+
+      <div class="lokasi-item">
+        <i class="fas fa-phone-alt"></i>
+        <div>
+          <strong>Telepon</strong>
+          <p>0821-4408-3032</p>
+        </div>
+      </div>
+
+      <div class="lokasi-item">
+        <i class="fas fa-clock"></i>
+        <div>
+          <strong>Jam Operasional</strong>
+          <p>
+            Senin – Jumat: 08.00 – 19.00<br>
+            Sabtu & Minggu: Libur
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
 
 @endsection
 @section('scripts')
