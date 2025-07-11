@@ -37,6 +37,10 @@
     -moz-appearance: none;
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20fill='gray'%20class='bi%20bi-caret-down-fill'%20viewBox='0%200%2016%2016'%3E%3Cpath%20d='M7.247%2011.14%202.451%205.658c-.566-.64-.106-1.658.753-1.658h9.592c.86%200%201.32%201.018.753%201.658L8.753%2011.14a1%201%200%200%201-1.506%200z'/%3E%3C/svg%3E");
 }
+
+.modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.2) !important; /* Lebih terang dari default */
+    }
 </style>
 
 @extends('layouts.admin')
@@ -49,7 +53,7 @@
         <div class="container mt-4">
             <h4>Daftar Menu Warung Ajus</h4>
             <div class="mb-3 d-flex justify-content-between align-items-center card-body table-responsive p-0">  
-                <button class="btn btn-primary" data-toggle="modal" data-target="#createMenuModal">Tambah Menu</button>
+                <button class="btn btn-primary" id="btn-open-modal" data-target="#createMenuModal">Tambah Menu</button>
             </div>
             
              <!-- Filter Kategori -->
@@ -173,6 +177,21 @@ $.ajaxSetup({
 });
 
 $(document).ready(function () {
+    $('#btn-open-modal').on('click', function () {
+        // Reset form & modal title
+        $('#createMenuModalLabel').text('Tambah Menu');
+        $('#create-menu-form')[0].reset();
+        $('#create-menu-form input[name="_method"]').remove();
+        $('#create-menu-form').attr('action', '/admin/menu/store');
+
+        // Tampilkan modal
+        $('#createMenuModal').modal('show');
+    });
+
+    $('#createMenuModal .close, #createMenuModal .btn-secondary').on('click', function () {
+        $('#createMenuModal').modal('hide');
+    });
+
     // $.noConflict();
     var table = $('#menu-table').DataTable({
         processing: true,
@@ -249,32 +268,29 @@ $(document).ready(function () {
                 console.log("AJAX success:", response);
 
                 if(response.success) {
-                    console.log('Menjalankan modal hide...');
-                    // 🔄 Cek apakah ini update atau create
                     let isUpdate = $('#create-menu-form input[name="_method"]').val() === 'PUT';
 
                     // Tutup modal
                     $('#createMenuModal').modal('hide');
 
-                    // Force cleanup (just in case)
-                    setTimeout(function () {
-                        $('body').removeClass('modal-open');
-                        $('.modal-backdrop').remove();
-                    }, 300);
-
-                    // Reset form dan reload data
+                    // Reset form
                     $('#create-menu-form')[0].reset();
                     $('#create-menu-form input[name="_method"]').remove();
+                    // Reload table
                     $('#menu-table').DataTable().ajax.reload();
 
-
                     // Notifikasi
-                    if (isUpdate) {
-                        alert("Menu berhasil diperbarui!");
-                    } else {
-                        alert("Menu berhasil ditambahkan!");
-                    }
-                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: isUpdate ? 'Menu Diperbarui' : 'Menu Ditambahkan',
+                        text: isUpdate ? 'Data menu berhasil diperbarui.' : 'Data menu berhasil ditambahkan.',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        // toast: true,
+                        // position: 'top-end'
+                    });
+                }
+                else {
                     alert("Error: " + response.message);
                 }
             },
@@ -288,7 +304,13 @@ $(document).ready(function () {
                     $.each(errors, function(key, value) {
                         errorMessages += value + '\n';
                     });
-                    alert("Validasi Gagal:\n" + errorMessages);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validasi Gagal',
+                        html: errorMessages.replace(/\n/g, '<br>'),
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
                 } else {
                     alert('Error: ' + xhr.responseText);
                 }
@@ -341,23 +363,50 @@ $(document).ready(function () {
     // Delete Menu
     $(document).on('click', '.btn-delete', function() {
         var id = $(this).data('id');
-        if (confirm('Apakah anda yakin untuk menghapus data menu ini?')) {
-            $.ajax({
-                url: '/admin/menu/' + id,
-                method: 'POST',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    _method: 'DELETE'
-                },
-                success: function(response) {
-                    $('#menu-table').DataTable().ajax.reload();
-                    alert('Menu berhasil dihapus.');
-                },
-                error: function(xhr) {
-                    alert('Error saat menghapus menu.');
-                }
-            });
-        }
+        Swal.fire({
+            title: 'Yakin ingin menghapus menu ini?',
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
+            background: '#fff',
+            backdrop: `rgba(0, 0, 0, 0.2)`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/menu/' + id,
+                    method: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        _method: 'DELETE'
+                    },
+                    success: function(response) {
+                        $('#menu-table').DataTable().ajax.reload();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Menu berhasil dihapus.',
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Terjadi kesalahan saat menghapus menu.',
+                            timer: 1800,
+                            showConfirmButton: false,
+                            // toast: true,
+                            // position: 'top-end'
+                        });
+                    }
+                });
+            }
+        });
     });
 
    // Reset form saat modal dibuka dari tombol Tambah Menu

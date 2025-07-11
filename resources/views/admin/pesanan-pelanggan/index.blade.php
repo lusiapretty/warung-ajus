@@ -38,6 +38,10 @@
 .badge i.fas.fa-circle {
     font-size: 0.5rem;
 }
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.2) !important; /* Lebih terang dari default */
+}
+
 </style>
 
 <!-- Main Content -->
