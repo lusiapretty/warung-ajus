@@ -95,6 +95,49 @@
       margin-bottom: 15px;
       font-size: 14px;
     }
+
+    @media (max-width: 480px) {
+  body {
+    padding: 20px;
+    align-items: flex-start;
+  }
+
+  .box {
+    padding: 30px 20px;
+    margin-top: 100%;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .form-group input {
+    font-size: 13px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .text-link {
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
+  .alert-success,
+  .alert-danger {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+
+
   </style>
 </head>
 <body>

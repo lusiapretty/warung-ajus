@@ -82,11 +82,33 @@
 </script>
 
 <script>
-  function toggleMenu() {
-    document.getElementById('mobileMenu').classList.toggle('show');
-  }
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+
+  hamburger.addEventListener('click', () => {
+    mobileMenu.classList.toggle('show');
+  });
 </script>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const userIcon = document.getElementById("user-icon");
+    const dropdown = document.getElementById("user-dropdown");
+
+    // Toggle tampil/sembunyi
+    userIcon.addEventListener("click", function (e) {
+      e.stopPropagation();
+      dropdown.classList.toggle("hidden");
+    });
+
+    // Klik di luar = tutup dropdown
+    document.addEventListener("click", function (e) {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.add("hidden");
+      }
+    });
+  });
+</script>
 
     <script>
         AOS.init();

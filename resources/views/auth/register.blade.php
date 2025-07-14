@@ -25,6 +25,7 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
       width: 100%;
       max-width: 360px;
+      
     }
 
     h2 {
@@ -98,6 +99,48 @@
     .text-link a:hover {
       text-decoration: underline;
     }
+
+    @media (max-width: 480px) {
+  body {
+    padding: 20px;
+    align-items: flex-start;
+  }
+
+  .box {
+    padding: 30px 20px;
+    margin-top: 160px;
+    border-radius: 12px;
+    
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  .input-wrapper input {
+    font-size: 13px;
+    padding: 10px 34px 10px 10px;
+  }
+
+  .toggle-password {
+    font-size: 13px;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .text-link {
+    font-size: 12px;
+  }
+
+  .error-message {
+    font-size: 12px;
+  }
+}
+
+    
   </style>
 </head>
 <body>

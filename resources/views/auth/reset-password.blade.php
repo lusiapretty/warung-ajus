@@ -97,6 +97,42 @@
       font-size: 12px;
       margin-top: 4px;
     }
+
+    @media (max-width: 480px) {
+  .box {
+    padding: 30px 20px;
+    margin: 20px;
+    border-radius: 10px;
+  }
+
+  h2 {
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+
+  .form-group input {
+    font-size: 13px;
+    padding: 10px 36px 10px 10px;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .info-text {
+    font-size: 12px;
+  }
+
+  .alert-danger {
+    font-size: 13px;
+  }
+
+  .error-message {
+    font-size: 12px;
+  }
+}
+
   </style>
 </head>
 <body>
