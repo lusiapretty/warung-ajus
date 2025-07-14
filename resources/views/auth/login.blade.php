@@ -125,6 +125,34 @@
     .eye-icon:hover {
       color: #333;
     }
+
+@media (max-width: 480px) {
+  .box {
+    padding: 30px 20px;
+    margin: 20px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  .form-group input {
+    font-size: 13px;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .text-link,
+  .forgot {
+    font-size: 12px;
+  }
+}
+
+
+    
   </style>
 </head>
 <body>
