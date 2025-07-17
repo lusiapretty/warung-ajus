@@ -33,6 +33,12 @@ class MenuController extends Controller
                 $query->where('kategori', $request->kategori);
             }
 
+            if ($request->stok == 'tersedia') {
+                    $query->where('status', 1); // Tersedia
+                } elseif ($request->stok == 'habis') {
+                    $query->where('status', 0); // Habis
+                }
+
             $data = $query->get();
 
             return DataTables::of($data)
@@ -47,21 +53,37 @@ class MenuController extends Controller
                 ->addColumn('addons', function ($row) {
                     return $row->addons->pluck('nama')->implode(', ');
                 })
-                ->addColumn('aksi', function ($row) {
-                    return '
-                        <button type="button" data-id="' . $row->id . '" class="btn btn-sm btn-primary btn-edit">
-                            <i class="fas fa-pen-alt"></i> Edit
-                        </button>
-                        <button type="button" data-id="' . $row->id . '" class="btn btn-sm btn-danger btn-delete">
-                            <i class="fas fa-trash-alt"></i> Hapus
-                        </button>';
+                ->addColumn('stok', function ($row) {
+                    $icon = $row->status
+                        ? '<i class="fas fa-check-circle text-light"></i> Tersedia'
+                        : '<i class="fas fa-times-circle text-light"></i> Habis';
+                    return '<button class="btn btn-sm toggle-status ' . ($row->status ? 'btn-success' : 'btn-danger') . '" data-id="' . $row->id . '" style="min-width: 90px">' . $icon . '</button>';
                 })
-                ->rawColumns(['gambar', 'aksi'])
+                ->addColumn('aksi', function ($row) {
+                    $editButton = '<button type="button" data-id="' . $row->id . '" class="btn btn-sm btn-primary btn-edit">
+                                    <i class="fas fa-pen-alt"></i> Edit</button>';
+
+                    $deleteButton = '<button type="button" data-id="' . $row->id . '" class="btn btn-sm btn-danger btn-delete">
+                                    <i class="fas fa-trash-alt"></i> Hapus</button>';
+
+                    return  $editButton . ' ' . $deleteButton;
+                })
+                ->rawColumns(['gambar', 'stok', 'aksi'])
                 ->make(true);
         }
         $addons = Addon::all();
         return view('admin.menu.index', compact('addons'));
     }
+
+    public function toggleStatus($id)
+    {
+        $menu = Menu::findOrFail($id);
+        $menu->status = !$menu->status;
+        $menu->save();
+
+        return response()->json(['success' => true, 'message' => 'Status menu diperbarui!']);
+    }
+
     public function create()
     {
         return view('admin.menu.create');

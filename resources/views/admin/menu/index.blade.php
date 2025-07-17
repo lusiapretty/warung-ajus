@@ -51,7 +51,7 @@
 <div class="content-wrapper">
     <section class="content">
         <div class="container mt-4">
-            <h4>Daftar Menu Warung Ajus</h4>
+            <h3>Daftar Menu Warung Ajus</h3>
             <div class="mb-3 d-flex justify-content-between align-items-center card-body table-responsive p-0">  
                 <button class="btn btn-primary" id="btn-open-modal" data-target="#createMenuModal">Tambah Menu</button>
             </div>
@@ -63,6 +63,13 @@
                         <option value="">Semua Kategori</option>
                         <option value="makanan">Makanan</option>
                         <option value="minuman">Minuman</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-control" id="filter-stok">
+                        <option value="">Semua Stok</option>
+                        <option value="tersedia">Tersedia</option>
+                        <option value="habis">Habis</option>
                     </select>
                 </div>
             </div>
@@ -79,6 +86,7 @@
                                 <th>Harga</th>
                                 <th>Kategori</th>
                                 <th>Gambar</th>
+                                <th>Stok</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -206,6 +214,7 @@ $(document).ready(function () {
             type: 'GET',
             data: function(d) {
                 d.kategori = $('#filter-kategori').val();
+                d.stok = $('#filter-stok').val(); 
             }
         },
         columns: [
@@ -216,6 +225,7 @@ $(document).ready(function () {
             { data: 'harga', name: 'harga', orderable: false },
             { data: 'kategori', name: 'kategori', orderable: false },
             { data: 'gambar', name: 'gambar', orderable: false},
+            { data: 'stok', name: 'stok', orderable: false },
             { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
         ],
         columnDefs: [
@@ -228,7 +238,7 @@ $(document).ready(function () {
         }); 
 
         // Trigger filter
-        $('#filter-kategori').on('change', function () {
+        $('#filter-kategori, #filter-stok').on('change', function () {
             table.draw();
         });
 
@@ -321,6 +331,35 @@ $(document).ready(function () {
 
                 return false;
             });
+
+
+    $(document).on('click', '.toggle-status', function () {
+    var id = $(this).data('id');
+
+        $.ajax({
+            url: '/admin/menu/toggle-status/' + id,
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                $('#menu-table').DataTable().ajax.reload();
+                Swal.fire({
+                    icon: 'success',
+                    title: response.message,
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Tidak bisa mengubah status menu.',
+                });
+            }
+        });
+    });
 
 
     // Edit Menu (saat klik tombol edit)

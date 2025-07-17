@@ -27,7 +27,7 @@
 
 @section('content')
 <div class="container mt-4">
-   <h2 class="mb-4">Daftar Semua Pelanggan</h2>
+   <h3 class="mb-4">Daftar Semua Pelanggan</h3>
 
 
     <div class="table-responsive">
