@@ -33,6 +33,48 @@
         <span></span>
         <span></span>     
       </div>
+=======
+
+    <div class="navbar-left">
+      <img src="{{ asset('img/logo-warung.png') }}" alt="Logo Warung" class="logo-warung">
+    </div>  
+
+      <nav>
+        <a href="{{ route('home')}}">Beranda</a>
+        <a href="{{ route('tentang')}}">Tentang Kami</a>
+        <a href="{{ route('menu.makanan')}}">Menu</a>
+        <a href="{{ route('home')}}">Kontak</a>
+      </nav>
+        <a href="{{ route('menu.makanan')}}" class="btn-pesan">Pesan Sekarang</a>
+
+    <div class="navbar-right">
+       <div class="icon-group">
+          <button type="button" class="btn position-relative" data-bs-toggle="modal" data-bs-target="#cartModal">
+                <i class="fas fa-shopping-cart icon"></i>
+                <span class="cart-count" id="cart-count">0</span>
+          </button>
+          
+              <div class="user-icon" onclick="toggleUserDropdown()">
+                <i class="fas fa-user icon"></i>
+              </div>
+
+                  <!-- HAMBURGER ICON -->
+                <div class="hamburger" id="hamburger">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="{{ route('home')}}">Beranda</a>
+  <a href="{{ route('tentang')}}">Tentang Kami</a>
+  <a href="{{ route('menu.makanan')}}">Menu</a>
+  <a href="{{ route('home')}}">Kontak</a>
+  <a href="{{ route('menu.makanan')}}" class="btn-pesan">Pesan Sekarang</a>
+</div>
 
           <!-- Dropdown Profil -->
           <div id="userDropdown" class="user-dropdown hidden">

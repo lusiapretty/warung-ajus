@@ -49,7 +49,6 @@
         <p class="menu-desc">Buah segar dengan kuah pindang khas Bali.</p>
       </div>
     </div>
-
     <!-- Item 2 -->
     <div class="menu-card">
       <div class="menu-image">
@@ -60,7 +59,6 @@
         <p class="menu-desc">Es segar campuran buah dan sirup manis.</p>
       </div>
     </div>
-
     <!-- Item 3 -->
     <div class="menu-card">
       <div class="menu-image">
@@ -71,7 +69,6 @@
         <p class="menu-desc">Soto ayam gurih lengkap dengan telur dan sambal.</p>
       </div>
     </div>
-
     <!-- Item 4 -->
     <div class="menu-card">
       <div class="menu-image">
@@ -84,6 +81,7 @@
     </div>
   </div>
 </section>
+
 
 <!-- TENTANG KAMI -->
 <section class="tentang-kami-elegan" id="tentangkami" data-aos="fade-up">
@@ -177,11 +175,6 @@
     </div>
   </div>
 </section>
-
-
-
-
-
 
 @endsection
 @section('scripts')
