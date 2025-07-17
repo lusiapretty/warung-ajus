@@ -60,7 +60,7 @@
 
 @section('content')
 <div class="container mt-4">
-    <h4>Daftar Add-ons</h4>
+    <h3>Daftar Add-ons</h3>
     <button class="btn btn-primary mb-3" id="btn-open-addon-modal" data-target="#addonModal">Tambah Add-on</button>
 
     <table class="table table-bordered table-striped" id="addon-table">

@@ -36,7 +36,7 @@ class OrderController extends Controller
     public function pesananSaya()
     {
         $orders = Order::where('user_id', auth()->id())
-                    ->with('items.menu') // jika relasi sudah dibuat
+                    ->with('items.menu')
                     ->latest()
                     ->get();
 
@@ -133,7 +133,6 @@ class OrderController extends Controller
                 ))
                 ->addColumn('tipe_pesanan', fn($order) => $order->tipe_pesanan)
                 ->addColumn('no_meja', function ($order) {
-                    // Tampilkan input nomor meja HANYA untuk dine_in
                     $form = '';
                     if ($order->tipe_pesanan === 'dine_in') {
                         $form = '
@@ -147,19 +146,33 @@ class OrderController extends Controller
                     // Jika no_meja ada dan pesanan dine in, cek apakah sedang terpakai
                     $statusBadge = '';
                     if ($order->no_meja && $order->tipe_pesanan === 'dine_in') {
-                        $isTerpakai = Order::where('no_meja', $order->no_meja)
+                        $isMejaSedangDipakai = Order::where('no_meja', $order->no_meja)
                             ->where('id', '!=', $order->id)
                             ->where('tipe_pesanan', 'dine_in')
                             ->where('payment_status', 'paid')
                             ->whereIn('status', ['pending', 'processing'])
-                            ->whereNotNull('no_meja')
                             ->exists();
 
-                        if ($isTerpakai) {
-                            $statusBadge = '<span class="badge bg-danger ms-2">Terpakai</span>';
+                        if (
+                            $order->no_meja &&
+                            $order->tipe_pesanan === 'dine_in' &&
+                            $order->payment_status === 'paid' &&
+                            in_array($order->status, ['pending', 'processing'])
+                        ) {
+                            $statusBadge = '<span class="badge bg-danger rounded-pill px-3 py-1">Terpakai</span>';
                         }
-                    }
 
+                        // $isMejaDipakai = Order::where('no_meja', $order->no_meja)
+                        //     ->where('tipe_pesanan', 'dine_in')
+                        //     ->where('payment_status', 'paid')
+                        //     ->whereIn('status', ['pending', 'processing', 'completed'])
+                        //     ->orderBy('id') // selain pesanan ini
+                        //     ->first();
+
+                        // if ($isMejaDipakai && $isMejaDipakai->id === $order->id) {
+                        //     $statusBadge = '<span class="badge bg-danger ms-2">Terpakai</span>';
+                        // }
+                    }
                     return '
                         <div class="d-flex flex-column gap-1">
                             ' . $form . '
@@ -168,7 +181,6 @@ class OrderController extends Controller
                             '</div>
                         </div>';
                 })
-
                 ->addColumn('payment_status', function ($order) {
                     $label = [
                         'pending' => 'Belum Dibayar',
@@ -196,7 +208,11 @@ class OrderController extends Controller
                             </div>
                         ';
                     }
-                    return '<div class="text-center"><span class="fw-bold text-' . ($color[$order->payment_status] ?? 'dark') . '">' . ($label[$order->payment_status] ?? $order->payment_status) . '</span></div>';
+                return '<div class="text-center">
+                    <span class="badge bg-' . ($color[$order->payment_status] ?? 'dark') . ' rounded-pill px-3 py-1 fw-semibold">
+                        ' . ($label[$order->payment_status] ?? ucfirst($order->payment_status)) . '
+                    </span>
+                </div>';
                 })
                 ->addColumn('status_pesanan', function ($order) {
                     $statusLabels = [
@@ -213,7 +229,7 @@ class OrderController extends Controller
                     
                     $html = '<form action="' . route('admin.orders.updateStatus', $order->id) . '" method="POST" class="status-form">'
                         . csrf_field() . method_field('PATCH')
-                        . '<select name="status" class="form-select form-select-sm fw-bold status-select text-' . $labelColor . '" data-initial="' . $order->status . '" onchange="updateSelectColor(this); this.form.submit();">';
+                        . '<select name="status" class="form-select form-select-sm fw-semibold border-' . $labelColor . ' text-' . $labelColor . '" style="max-width: 150px;" data-initial="' . $order->status . '" onchange="updateSelectColor(this); this.form.submit();">';
                         
                     foreach ($statusLabels as $value => $data) {
                         $selected = $order->status === $value ? 'selected' : '';
@@ -269,6 +285,17 @@ class OrderController extends Controller
         return response()->json(['meja_terpakai' => $mejaTerpakai]);
     }
 
+    public function updateStatusMeja($id)
+    {
+        $order = Order::findOrFail($id);
+
+        // Misalnya ada kolom 'status_meja' di tabel orders
+        $order->status_meja = 'tersedia';
+        $order->save();
+
+        return response()->json(['message' => 'Status meja berhasil diubah menjadi tersedia']);
+    }
+
     public function updateNoMeja(Request $request, Order $order)
     {
         $request->validate([
@@ -277,10 +304,10 @@ class OrderController extends Controller
 
         if ($request->no_meja) {
             $mejaTerpakai = Order::where('no_meja', $request->no_meja)
-                ->where('id', '!=', $order->id) // pengecualian: pesanan ini sendiri
+                ->where('id', '!=', $order->id)
                 ->where('tipe_pesanan', 'dine_in')
-                ->where('payment_status', 'paid') // hanya yang sudah dibayar
-                ->whereIn('status', ['pending', 'processing'])
+                ->where('payment_status', 'paid')
+                ->whereIn('status', ['pending', 'processing', 'completed'])
                 ->whereNotNull('no_meja') 
                 ->exists();
 

@@ -14,14 +14,23 @@
     <div class="menu-grid">
       @foreach ($menus as $menu)
         @if (strtolower($menu->kategori) === 'minuman')
-          <div class="menu-item">
-            <div class="menu-image-wrapper">
+          <div class="menu-item {{ $menu->status == 0 ? 'unavailable' : ''}}">
+            <div class="menu-image-wrapper position-relative">
               <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}">
+
+              @if ($menu->status == 0)
+                <div class="menu-overlay">
+                  <span class="text-habis">HABIS</span>
+                </div>
+              @endif
             </div>
             <div class="menu-details" style="padding: 15px;">
               <h5>{{ $menu->nama_menu }}</h5>
               <p>Rp {{ number_format($menu->harga, 0, ',', '.') }}</p>
-              <i class="fas fa-plus" onclick="openAddonModal('{{ $menu->nama_menu }}', {{ $menu->id }})"></i>
+
+              @if ($menu->status == 1)
+                <i class="fas fa-plus" onclick="openAddonModal('{{ $menu->nama_menu }}', {{ $menu->id }})"></i>
+              @endif
             </div>
           </div>
         @endif
