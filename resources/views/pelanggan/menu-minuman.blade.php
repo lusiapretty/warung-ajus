@@ -15,10 +15,14 @@
       @foreach ($menus as $menu)
         @if (strtolower($menu->kategori) === 'minuman')
           <div class="menu-item">
-            <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}">
-            <h5>{{ $menu->nama_menu }}</h5>
-            <p>Rp {{ number_format($menu->harga, 0, ',', '.') }}</p>
-            <i class="fas fa-plus" onclick="openAddonModal('{{ $menu->nama_menu }}', {{ $menu->id }})"></i>
+            <div class="menu-image-wrapper">
+              <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}">
+            </div>
+            <div class="menu-details" style="padding: 15px;">
+              <h5>{{ $menu->nama_menu }}</h5>
+              <p>Rp {{ number_format($menu->harga, 0, ',', '.') }}</p>
+              <i class="fas fa-plus" onclick="openAddonModal('{{ $menu->nama_menu }}', {{ $menu->id }})"></i>
+            </div>
           </div>
         @endif
       @endforeach
@@ -39,7 +43,7 @@
         <h4 id="modalTitle"></h4>
         <p id="modalPrice" class="modal-price"></p>
       </div>
-      <h6>Pilih Add-on</h6>
+      <h6 id="addonTitle">Pilih Add-on</h6>
       <div id="addonContent" class="addon-list"></div>
 
       <label for="catatan">Catatan (opsional):</label>
@@ -50,8 +54,6 @@
         <span id="qtyDisplay">1</span>
         <i class="fas fa-plus" onclick="updateQty(1)"></i>
       </div>
-
-      {{-- <p id="totalPrice" class="modal-total-price"></p> --}}
     </div>
   </div>
 
@@ -91,19 +93,11 @@
     const basePrice = baseMenuPrices[menuName] || 0;
     const addons = menuData.addons || [];
 
-    document.getElementById('modalPrice').innerText = `${basePrice.toLocaleString('id-ID')}`;
+    document.getElementById('modalPrice').innerText = `Rp${basePrice.toLocaleString('id-ID')}`;
 
     const addonContent = document.getElementById('addonContent');
     addonContent.innerHTML = '';
 
-    addons.forEach((addon) => {
-      addonContent.innerHTML += `
-        <label>
-          <span>${addon.nama} - Rp${addon.harga.toLocaleString()}</span>
-          <input type="checkbox" name="addon" value="${addon.nama}" data-price="${addon.harga}" onchange="calculateTotal()">
-        </label>
-      `;
-    });
 
     document.getElementById('modalImage').src = getImageUrl(menuName);
     document.getElementById('modalTitle').innerText = menuName;
@@ -137,6 +131,17 @@
 
     calculateTotal();
 
+    // Sembunyikan bagian add-on dan catatan untuk minuman
+    document.querySelector('h6').style.display = 'none'; // Judul Add-on
+    document.getElementById('addonTitle').style.display = 'none'; // Konten Add-on
+
+    const catatanLabel = document.querySelector('label[for="catatan"]');
+    if (catatanLabel) catatanLabel.style.display = 'none';
+    document.getElementById('catatan').style.display = 'none';
+
+    // Ubah tinggi modal jadi lebih pendek
+    document.querySelector('.addon-modal').classList.add('short');
+
     document.body.classList.add('modal-open');
 
     document.getElementById('addonOverlay').style.display = 'flex';
@@ -162,10 +167,10 @@
         return sum + Number(el.dataset.price); 
     }, 0);
     const total = (basePrice + addonTotal) * quantity;
-    // document.getElementById('totalPrice').innerText = `Total: Rp${total.toLocaleString('id-ID')}`;
+    // document.getElementById('totalPrice').innerText = Total: Rp${total.toLocaleString('id-ID')};
 
     // Tampilkan total harga di tombol
-    document.getElementById('btnTotalHarga').innerText = `Rp${total.toLocaleString('id-ID')}`;
+document.getElementById('btnTotalHarga').innerText = `Rp${total.toLocaleString('id-ID')}`;
   }
 
   function closeAddonModal() {
@@ -175,6 +180,17 @@
     document.body.classList.remove('blurred');
     document.getElementById('catatan').value = '';
     editingIndex = null;
+
+     // Tampilkan kembali elemen yang disembunyikan
+    document.querySelector('h6').style.display = 'block';
+    document.getElementById('addonTitle').style.display = 'block';
+
+    const catatanLabel = document.querySelector('label[for="catatan"]');
+    if (catatanLabel) catatanLabel.style.display = 'block';
+    document.getElementById('catatan').style.display = 'block';
+
+    // Hapus class "short" dari modal
+    document.querySelector('.addon-modal').classList.remove('short');
   }
 
   function submitAddon() {
@@ -189,7 +205,7 @@
     // document.getElementById('catatan').value = '';
     console.log("CATATAN:", document.getElementById('catatan').value);
 
-    const image = getImageUrl(currentMenu).replace('/storage/', '');
+    const image = menuImages[currentMenu];;
     const cart = JSON.parse(storage.getItem(cartKey)) || [];
 
     const menu_id = currentMenuId;
@@ -225,7 +241,7 @@
     Swal.fire({
       icon: 'success',
       title: 'Berhasil Diubah',
-      text: `${currentMenu} berhasil diperbarui.`,
+      text: ${currentMenu} berhasil diperbarui.,
       timer: 1600,
       showConfirmButton: false
     });
@@ -233,7 +249,7 @@
     Swal.fire({
       icon: 'success',
       title: 'Berhasil Ditambahkan',
-      text: `${currentMenu} berhasil ditambahkan ke keranjang.`,
+      text: ${currentMenu} berhasil ditambahkan ke keranjang.,
       timer: 1600,
       showConfirmButton: false
     });
