@@ -1,9 +1,8 @@
 <header class="navbar">
 
-    <div class="navbar-left">
-      <img src="{{ asset('img/logo-warung.png') }}" alt="Logo Warung" class="logo-warung">
-    </div>  
-
+  <div class="navbar-left">
+    <img src="{{ asset('img/logo-warung.png') }}" alt="Logo Warung" class="logo-warung">
+  </div>  
       <nav>
         <a href="{{ route('home')}}">Beranda</a>
         <a href="{{ route('tentang')}}">Tentang Kami</a>
@@ -41,43 +40,43 @@
   <a href="{{ route('menu.makanan')}}" class="btn-pesan">Pesan Sekarang</a>
 </div>
 
+          <!-- Dropdown Profil -->
+          <div id="userDropdown" class="user-dropdown hidden">
+            @if(Auth::check() && Auth::user()->role === 'pelanggan')
+              <div class="dropdown-header">
+                <p>Halo, <strong>{{ Auth::user()->nama }}</strong></p>
+                <small>Kelola akun & pesanan Anda</small>
+              </div>
 
-    <!-- Dropdown Profil -->
-    <div id="userDropdown" class="user-dropdown hidden">
-      @if(Auth::check() && Auth::user()->role === 'pelanggan')
-        <div class="dropdown-header">
-          <p>Halo, <strong>{{ Auth::user()->nama }}</strong></p>
-          <small>Kelola akun & pesanan Anda</small>
+              <ul class="dropdown-list">
+                <li><a href="{{ route('profil.edit') }}"><i class="fas fa-user-circle"></i> Profil Saya</a></li>
+                <li><a href="{{ route('pesanan.saya')}}"><i class="fas fa-box-open"></i> Pesanan Saya</a></li>
+              </ul>
+
+              <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn logout-btn">Logout</button>
+              </form>
+            @else
+              <div class="dropdown-header">
+                <p>Selamat Datang di <br><strong>Warung Ajus</strong></p>
+                <small>Akses akun & kelola pesanan</small>
+              </div>
+
+              <div class="dropdown-actions">
+                <a href="{{ route('login') }}" class="btn login-btn">Login</a>
+                <a href="{{ route('register') }}" class="btn register-btn">Daftar</a>
+              </div>
+            @endif
+          </div>
         </div>
-
-        <ul class="dropdown-list">
-          <li><a href="{{ route('profil.edit') }}"><i class="fas fa-user-circle"></i> Profil Saya</a></li>
-          <li><a href="{{ route('pesanan.saya')}}"><i class="fas fa-box-open"></i> Pesanan Saya</a></li>
-        </ul>
-
-        <form method="POST" action="{{ route('logout') }}">
-          @csrf
-          <button type="submit" class="btn logout-btn">Logout</button>
-        </form>
-      @else
-        <div class="dropdown-header">
-          <p>Selamat Datang di <br><strong>Warung Ajus</strong></p>
-          <small>Akses akun & kelola pesanan</small>
-        </div>
-
-        <div class="dropdown-actions">
-          <a href="{{ route('login') }}" class="btn login-btn">Login</a>
-          <a href="{{ route('register') }}" class="btn register-btn">Daftar</a>
-        </div>
-      @endif
+      </div>
     </div>
-  </div>
-</div>
 </header>
 
 <!-- Modal Keranjang -->
 <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+  <div class="modal-dialog custom-modal modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header bg-warning">
         <h5 class="modal-title fw-bold" id="cartModalLabel">🛒 Keranjang Anda</h5>
@@ -89,7 +88,7 @@
       <div class="modal-footer justify-content-between">
         <h5 id="grandTotal">Total: Rp0</h5>
         <button class="btn btn-lg btn-warning fw-bold px-5" onclick="openCheckoutModal()">
-          <i class="fa fa-shopping-cart me-2"></i> Checkout Sekarang
+          <i class="fa  me-2"></i> Checkout Sekarang
         </button>
       </div>
     </div>
@@ -98,9 +97,9 @@
 
 <!-- Modal Checkout -->
 <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+  <div class="modal-dialog custom-modal modal-dialog-scrollable">
     <div class="modal-content">
-      <div class="modal-header bg-warning text-white">
+      <div class="modal-header bg-warning text-dark">
         <h5 class="modal-title fw-bold" id="checkoutModalLabel">🧾Konfirmasi Pesanan</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
       </div>

@@ -14,11 +14,24 @@
   <div class="menu-grid">
     @foreach ($menus as $menu)
       @if (strtolower($menu->kategori) === 'makanan')
-        <div class="menu-item">
-          <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}">
-          <h5>{{ $menu->nama_menu }}</h5>
-          <p>Rp {{ number_format($menu->harga, 0, ',', '.') }}</p>
-          <i class="fas fa-plus" onclick="openAddonModal('{{ $menu->nama_menu }}', {{ $menu->id }})"></i>
+        <div class="menu-item {{ $menu->status == 0 ? 'unavailable' : ''}}">
+          <div class="menu-image-wrapper position-relative">
+            <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}">
+
+            @if ($menu->status == 0)
+              <div class="menu-overlay">
+                <span class="text-habis">HABIS</span>
+              </div>
+            @endif
+          </div>
+          <div class="menu-details" style="padding: 15px;">
+            <h5>{{ $menu->nama_menu }}</h5>
+            <p>Rp {{ number_format($menu->harga, 0, ',', '.') }}</p>
+
+            @if ($menu->status == 1)
+              <i class="fas fa-plus" onclick="openAddonModal('{{ $menu->nama_menu }}', {{ $menu->id }})"></i>
+            @endif
+          </div>
         </div>
       @endif
     @endforeach
@@ -27,7 +40,7 @@
 
 <!-- Overlay dan Modal Add-on -->
 <div id="addonOverlay" class="addon-overlay">
-  <div class="addon-modal">
+  <div class="addon-modal" id="addonModal">
     <span class="close-btn" onclick="closeAddonModal()">&times;</span>
   <div class="modal-body-wrapper">
     <div class="modal-image-wrapper no-padding">
@@ -39,6 +52,7 @@
         <h4 id="modalTitle"></h4>
         <p id="modalPrice" class="modal-price"></p>
       </div>
+      <p id="modalDesc" class="text-muted" style="font-size: 14px"></p>
       <h6>Pilih Add-on</h6>
       <div id="addonContent" class="addon-list"></div>
 
@@ -93,9 +107,18 @@
 
     document.getElementById('modalPrice').innerText = `${basePrice.toLocaleString('id-ID')}`;
 
-    const addonContent = document.getElementById('addonContent');
-    addonContent.innerHTML = '';
+    document.getElementById('modalTitle').innerText = menuName;
+    document.getElementById('modalDesc').innerText = menuData.deskripsi || '';
 
+    const addonContent = document.getElementById('addonContent');
+    const addonTitle = document.querySelector('.addon-modal h6');
+
+    if (addons.length === 0) {
+      addonContent.innerHTML = '';
+      addonTitle.style.display = 'none';
+    } else {
+      addonTitle.style.display = 'block';
+      addonContent.innerHTML = ''; 
     addons.forEach((addon) => {
       addonContent.innerHTML += `
         <label>
@@ -104,9 +127,22 @@
         </label>
       `;
     });
+  }
 
     document.getElementById('modalImage').src = getImageUrl(menuName);
-    document.getElementById('modalTitle').innerText = menuName;
+
+    const modalElement = document.querySelector('.addon-modal');
+
+    // Cek apakah deskripsi kosong dan tidak ada add-on
+    const hasDesc = menuData.deskripsi && menuData.deskripsi.trim() !== '';
+    const hasAddons = addons.length > 0;
+
+    // Tambah atau hapus class "short"
+    if (!hasDesc && !hasAddons) {
+      modalElement.classList.add('short');
+    } else {
+      modalElement.classList.remove('short');
+    }
 
   // Jika sedang edit
   if (itemData) {
@@ -189,7 +225,7 @@
     // document.getElementById('catatan').value = '';
     console.log("CATATAN:", document.getElementById('catatan').value);
 
-    const image = getImageUrl(currentMenu).replace('/storage/', '');
+    const image = menuImages[currentMenu];
     const cart = JSON.parse(storage.getItem(cartKey)) || [];
 
     const menu_id = currentMenuId;

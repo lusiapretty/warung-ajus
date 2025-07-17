@@ -105,6 +105,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/menu/create', [MenuController::class, 'create'])->name('admin.menu.create');
     Route::post('/admin/menu/store', [MenuController::class, 'store'])->name('admin.menu.store');
     Route::get('/admin/menu/{id}/edit', [MenuController::class, 'edit'])->name('admin.menu.edit');
+    Route::post('/admin/menu/toggle-status/{id}', [MenuController::class, 'toggleStatus'])->name('admin.menu.toggleStatus');
     Route::put('/admin/menu/update/{id}', [MenuController::class, 'update'])->name('admin.menu.update');
     Route::delete('/admin/menu/{id}', [MenuController::class, 'destroy'])->name('admin.menu.destroy');
     Route::get('/admin/menu/{id}', [MenuController::class, 'show']);
@@ -126,7 +127,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/orders/{id}/print', [OrderController::class, 'print'])->name('admin.orders.print');
     Route::get('/admin/orders/datatables', [OrderController::class, 'getDatatables'])->name('admin.orders.datatables');
     Route::get('/admin/orders/{order}', [AdminController::class, 'show'])->name('admin.orders.show');
+    // Route::patch('/admin/orders/{order}/update-status-meja', [OrderController::class, 'updateStatusMeja'])->name('admin.orders.updateStatusMeja');
     Route::patch('/admin/orders/{order}/update-no-meja', [OrderController::class, 'updateNoMeja'])->name('admin.orders.updateNoMeja');
+    // Route::patch('/admin/orders/{order}/toggle-meja-status', [OrderController::class, 'toggleMejaStatus'])->name('admin.orders.toggleMejaStatus');
+    // Route::patch('/admin/orders/{order}/release-table', [OrderController::class, 'releaseTable'])->name('admin.orders.releaseTable');
 
 
     Route::patch('/admin/orders/{order}/update-payment-status', [OrderController::class, 'updatePaymentStatus'])->name('admin.orders.updatePaymentStatus');

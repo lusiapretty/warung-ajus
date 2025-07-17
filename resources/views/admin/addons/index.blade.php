@@ -45,19 +45,23 @@
         width: 20px !important;
         text-align: center;
     }
-    
     th.no-sort::before,
     th.no-sort::after {
         display: none !important;
     }
+
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.2) !important; /* Lebih terang dari default */
+    }
+
 </style>
 
 @extends('layouts.admin')
 
 @section('content')
 <div class="container mt-4">
-    <h4>Daftar Add-ons</h4>
-    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addonModal">Tambah Add-on</button>
+    <h3>Daftar Add-ons</h3>
+    <button class="btn btn-primary mb-3" id="btn-open-addon-modal" data-target="#addonModal">Tambah Add-on</button>
 
     <table class="table table-bordered table-striped" id="addon-table">
         <thead>
@@ -108,6 +112,17 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function () {
+
+    // Buka modal tambah secara manual
+    $('#btn-open-addon-modal').on('click', function () {
+        $('#addonForm')[0].reset();
+        $('#addon_id').val('');
+        $('#_method').val('POST');
+        $('.modal-title').text('Tambah Add-on');
+        $('#addonForm button[type="submit"]').text('Simpan');
+        $('#addonModal').modal('show');
+    });
+
     let table = $('#addon-table').DataTable({
         processing: true,
         serverSide: true,
@@ -119,6 +134,12 @@ $(document).ready(function () {
             { data: 'aksi', orderable: false, searchable: false }
         ]
     });
+
+    // Memastikan tombol x dan tombol tutup tetap berfungsi
+    $('#addonModal .close, #addonModal .btn-secondary').on('click', function () {
+        $('#addonModal').modal('hide');
+    });
+
 
     $('#addonModal').on('hidden.bs.modal', function () {
         $('#addonForm')[0].reset();
@@ -146,10 +167,9 @@ $(document).ready(function () {
 
         $.post(url, data, function (res) {
             console.log('Callback success:', res);
-            $('#addonModal').modal('hide');
-            // setTimeout(() => {
-            //     $('#addonModal').modal('hide');
-            // }, 200);
+            if ($('#addonModal').hasClass('show')) {
+                $('#addonModal').modal('hide');
+            }
 
             table.ajax.reload();
 
@@ -184,13 +204,15 @@ $(document).ready(function () {
     $(document).on('click', '.btn-delete', function () {
         const id = $(this).data('id');
         Swal.fire({
-            title: 'Yakin ingin hapus?',
+            title: 'Yakin ingin menghapus add on ini?',
             text: "Data yang dihapus tidak bisa dikembalikan!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!'
+            confirmButtonText: 'Ya, hapus!',
+            background: '#fff',
+            backdrop: `rgba(0, 0, 0, 0.2)`
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({

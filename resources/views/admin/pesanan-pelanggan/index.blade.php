@@ -38,6 +38,10 @@
 .badge i.fas.fa-circle {
     font-size: 0.5rem;
 }
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.2) !important; /* Lebih terang dari default */
+}
+
 </style>
 
 <!-- Main Content -->
@@ -99,7 +103,7 @@
                                     <th>Catatan</th>
                                     <th>Total Harga</th>
                                     <th>Tipe Pesanan</th>
-                                    <th>No Meja</th>
+                                    <th>Nomor Meja</th>
                                     <th>Status Pembayaran</th>
                                     <th>Status Pesanan</th>
                                     <th>Aksi</th>
@@ -209,8 +213,6 @@
  */
 function showToast(type, title){
     Swal.fire({
-        // toast: true,
-        // position: 'top',      // pojok kanan‑atas; ubah ke 'top' jika mau di tengah atas
         icon: type,
         title: title,
         showConfirmButton: false,
@@ -242,6 +244,28 @@ $(document).on('submit', '.no-meja-form', function(e) {
         },
         error: function (xhr) {
             const msg = xhr.responseJSON?.message || 'Gagal memperbarui nomor meja';
+            showToast('error', msg);
+        }
+    });
+});
+
+$(document).on('submit', 'form[action*="toggle-meja-status"]', function(e) {
+    e.preventDefault();
+    const form = $(this);
+    const url = form.attr('action');
+
+    if (!confirm('Ubah status meja ini?')) return;
+
+    $.ajax({
+        url: url,
+        type: 'PATCH',
+        data: form.serialize(),
+        success: function(res) {
+            showToast('success', 'Status meja berhasil diperbarui');
+            $('#menu-table').DataTable().ajax.reload(null, false); // Reload tanpa reset paging
+        },
+        error: function(err) {
+            const msg = err.responseJSON?.message || 'Gagal mengubah status meja';
             showToast('error', msg);
         }
     });
@@ -321,6 +345,30 @@ $(document).ready(function () {
         table.draw();
     });
 });
+
+// $(document).on('change', '.status-select', function () {
+//     const select = $(this);
+//     const orderId = select.data('id');
+//     const status = select.val();
+
+//     $.ajax({
+//         url: `/admin/orders/${orderId}/status`,
+//         type: 'PATCH',
+//         data: {
+//             _token: '{{ csrf_token() }}',
+//             _method: 'PATCH',
+//             status: status
+//         },
+//         success: function () {
+//             showToast('success', 'Status pesanan diperbarui');
+//             $('#menu-table').DataTable().ajax.reload(null, false);
+//         },
+//         error: function (xhr) {
+//             const msg = xhr.responseJSON?.message || 'Gagal mengubah status pesanan';
+//             showToast('error', msg);
+//         }
+//     });
+// });
 
 $(document).ready(function () {
     $('#submitExportPdf').on('click', function () {

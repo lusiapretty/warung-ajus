@@ -267,7 +267,7 @@
                       </div>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                      <h6 class="mb-1">Order #{{ $order->order_id }}</h6>
+                      <h6 class="mb-1">{{ $order->order_id }}</h6>
                       <p class="mb-0 text-muted">{{ $order->created_at->diffForHumans() }}</p>
                     </div>
                     <div class="flex-shrink-0 text-end">

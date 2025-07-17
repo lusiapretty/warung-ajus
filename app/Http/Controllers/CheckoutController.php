@@ -62,6 +62,7 @@ class CheckoutController extends Controller
             'pembayaran'     => $data['pembayaran'] ?? 'midtrans',
             'status'         => 'pending',
             'user_id'        => auth()->id(), 
+            'status_meja'   => 'terpakai', 
         ]);
 
         $totalHarga = 0;
@@ -120,6 +121,7 @@ class CheckoutController extends Controller
                 'status'          => 'processing', 
                 'payment_status'  => 'paid',
                 'total'           => $data['total'],
+                'status_meja'     => 'terpakai',
             ]);
 
             foreach ($data['menu'] as $item) {
