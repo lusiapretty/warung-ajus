@@ -76,7 +76,7 @@ body::before {
 
 /* === LOGO === */
 .logo-warung {
-  width: 150px;
+  width: 80px;
   transition: all 0.3s ease;
   margin-left: 120px;
 }
@@ -768,9 +768,6 @@ body::before {
   }
 }
 
-
-
-
  .btn-selengkapnya {
     display: inline-block;
     background: white;
@@ -801,9 +798,9 @@ body::before {
 
 .user-dropdown {
   position: absolute;
-  right: 0;
-  top: 80%;
-  width: 260px;
+  right: 15px;
+  top: 70%;
+  width: 250px;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -871,13 +868,14 @@ body::before {
 .dropdown-actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  align-items: center;
 }
 
 .btn {
   display: block;
   width: 100%;
-  padding:6px;
+  padding: 7px;
   border-radius: 25px;
   font-weight: bold;
   text-align: center;
@@ -1094,6 +1092,17 @@ body::before {
   }
 }
 
+    .bg-pesanan {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 110px 20px 40px; /* Padding top agar tidak tabrakan dengan navbar */
+        background-image: url('../img/hero-bg.jpg'); /* pastikan path-nya sesuai */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        min-height: 100vh;
+    }
 
 
 

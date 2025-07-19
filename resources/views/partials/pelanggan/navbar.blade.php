@@ -18,17 +18,16 @@
                 <span class="cart-count" id="cart-count">0</span>
           </button>
           
-              <div class="user-icon" onclick="toggleUserDropdown()">
-                <i class="fas fa-user icon"></i>
-              </div>
+          <div class="user-icon" onclick="toggleUserDropdown()">
+            <i class="fas fa-user icon"></i>
+          </div>
 
-                  <!-- HAMBURGER ICON -->
-                <div class="hamburger" id="hamburger">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-            </div>
+          <!-- HAMBURGER ICON -->
+          <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </div>
     </div>
 
@@ -69,9 +68,6 @@
               </div>
             @endif
           </div>
-        </div>
-      </div>
-    </div>
 </header>
 
 <!-- Modal Keranjang -->
