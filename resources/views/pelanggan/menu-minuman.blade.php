@@ -14,6 +14,11 @@
     <div class="menu-grid">
       @foreach ($menus as $menu)
         @if (strtolower($menu->kategori) === 'minuman')
+
+          <div class="menu-item">
+            <div class="menu-image-wrapper">
+              <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}">
+
           <div class="menu-item {{ $menu->status == 0 ? 'unavailable' : ''}}">
             <div class="menu-image-wrapper position-relative">
               <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}">
@@ -23,14 +28,19 @@
                   <span class="text-habis">HABIS</span>
                 </div>
               @endif
+
             </div>
             <div class="menu-details" style="padding: 15px;">
               <h5>{{ $menu->nama_menu }}</h5>
               <p>Rp {{ number_format($menu->harga, 0, ',', '.') }}</p>
 
+              <i class="fas fa-plus" onclick="openAddonModal('{{ $menu->nama_menu }}', {{ $menu->id }})"></i>
+
+
               @if ($menu->status == 1)
                 <i class="fas fa-plus" onclick="openAddonModal('{{ $menu->nama_menu }}', {{ $menu->id }})"></i>
               @endif
+
             </div>
           </div>
         @endif
@@ -102,7 +112,7 @@
     const basePrice = baseMenuPrices[menuName] || 0;
     const addons = menuData.addons || [];
 
-    document.getElementById('modalPrice').innerText = `${basePrice.toLocaleString('id-ID')}`;
+    document.getElementById('modalPrice').innerText = `Rp${basePrice.toLocaleString('id-ID')}`;
 
     const addonContent = document.getElementById('addonContent');
     addonContent.innerHTML = '';
@@ -176,10 +186,10 @@
         return sum + Number(el.dataset.price); 
     }, 0);
     const total = (basePrice + addonTotal) * quantity;
-    // document.getElementById('totalPrice').innerText = `Total: Rp${total.toLocaleString('id-ID')}`;
+    // document.getElementById('totalPrice').innerText = Total: Rp${total.toLocaleString('id-ID')};
 
     // Tampilkan total harga di tombol
-    document.getElementById('btnTotalHarga').innerText = `Rp${total.toLocaleString('id-ID')}`;
+document.getElementById('btnTotalHarga').innerText = `Rp${total.toLocaleString('id-ID')}`;
   }
 
   function closeAddonModal() {
@@ -250,7 +260,7 @@
     Swal.fire({
       icon: 'success',
       title: 'Berhasil Diubah',
-      text: `${currentMenu} berhasil diperbarui.`,
+      text: ${currentMenu} berhasil diperbarui.,
       timer: 1600,
       showConfirmButton: false
     });
@@ -258,7 +268,7 @@
     Swal.fire({
       icon: 'success',
       title: 'Berhasil Ditambahkan',
-      text: `${currentMenu} berhasil ditambahkan ke keranjang.`,
+      text: ${currentMenu} berhasil ditambahkan ke keranjang.,
       timer: 1600,
       showConfirmButton: false
     });
