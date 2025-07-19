@@ -14,11 +14,6 @@
     <div class="menu-grid">
       @foreach ($menus as $menu)
         @if (strtolower($menu->kategori) === 'minuman')
-
-          <div class="menu-item">
-            <div class="menu-image-wrapper">
-              <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}">
-
           <div class="menu-item {{ $menu->status == 0 ? 'unavailable' : ''}}">
             <div class="menu-image-wrapper position-relative">
               <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}">
@@ -28,19 +23,14 @@
                   <span class="text-habis">HABIS</span>
                 </div>
               @endif
-
             </div>
             <div class="menu-details" style="padding: 15px;">
               <h5>{{ $menu->nama_menu }}</h5>
               <p>Rp {{ number_format($menu->harga, 0, ',', '.') }}</p>
 
-              <i class="fas fa-plus" onclick="openAddonModal('{{ $menu->nama_menu }}', {{ $menu->id }})"></i>
-
-
               @if ($menu->status == 1)
-                <i class="fas fa-plus" onclick="openAddonModal('{{ $menu->nama_menu }}', {{ $menu->id }})"></i>
+                <i class="fas fa-plus menu-add-btn" data-menu-name="{{ $menu->nama_menu }}" data-menu-id="{{ $menu->id }}"></i>
               @endif
-
             </div>
           </div>
         @endif
@@ -91,6 +81,13 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+  // Make functions global by attaching to window
+  window.openAddonModal = openAddonModal;
+  window.closeAddonModal = closeAddonModal;
+  window.updateQty = updateQty;
+  window.submitAddon = submitAddon;
+  window.editItem = editItem;
+
   const baseMenuPrices = @json($menus->pluck('harga', 'nama_menu'));
   const menuImages = @json($menus->pluck('gambar', 'nama_menu'));
   const menuDataById = @json($menus->keyBy('id'));
@@ -100,6 +97,72 @@
   let currentMenuId = null;
   let quantity = 1;
   let editingIndex = null;
+
+  // Event listener approach (recommended)
+  document.addEventListener('DOMContentLoaded', function() {
+    // Remove any existing event listeners to prevent duplication
+    const existingButtons = document.querySelectorAll('.menu-add-btn');
+    existingButtons.forEach(button => {
+      // Clone and replace to remove all event listeners
+      const newButton = button.cloneNode(true);
+      button.parentNode.replaceChild(newButton, button);
+    });
+
+    // Add click event listeners to menu add buttons
+    document.querySelectorAll('.menu-add-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const menuName = this.dataset.menuName;
+        const menuId = this.dataset.menuId;
+        openAddonModal(menuName, menuId);
+      });
+    });
+
+    // Add click event listener to close button (only if not already added)
+    const closeBtn = document.querySelector('.close-btn');
+    if (closeBtn && !closeBtn.hasAttribute('data-listener-added')) {
+      closeBtn.setAttribute('data-listener-added', 'true');
+      closeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeAddonModal();
+      });
+    }
+    
+    // Add click event listeners to quantity buttons (only if not already added)
+    const minusBtn = document.querySelector('.quantity-control .fa-minus');
+    const plusBtn = document.querySelector('.quantity-control .fa-plus');
+    
+    if (minusBtn && !minusBtn.hasAttribute('data-listener-added')) {
+      minusBtn.setAttribute('data-listener-added', 'true');
+      minusBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        updateQty(-1);
+      });
+    }
+    
+    if (plusBtn && !plusBtn.hasAttribute('data-listener-added')) {
+      plusBtn.setAttribute('data-listener-added', 'true');
+      plusBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        updateQty(1);
+      });
+    }
+    
+    // Add click event listener to add to cart button (only if not already added)
+    const addToCartBtn = document.querySelector('.add-to-cart-btn');
+    if (addToCartBtn && !addToCartBtn.hasAttribute('data-listener-added')) {
+      addToCartBtn.setAttribute('data-listener-added', 'true');
+      addToCartBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        submitAddon();
+      });
+    }
+  });
 
   function openAddonModal(menuName, menuId, itemData = null, index = null) {
     currentMenu = menuName;
@@ -112,41 +175,40 @@
     const basePrice = baseMenuPrices[menuName] || 0;
     const addons = menuData.addons || [];
 
-    document.getElementById('modalPrice').innerText = `Rp${basePrice.toLocaleString('id-ID')}`;
+    document.getElementById('modalPrice').innerText = `Rp ${basePrice.toLocaleString('id-ID')}`;
 
     const addonContent = document.getElementById('addonContent');
     addonContent.innerHTML = '';
 
-
     document.getElementById('modalImage').src = getImageUrl(menuName);
     document.getElementById('modalTitle').innerText = menuName;
 
-  // Jika sedang edit
-  if (itemData) {
-  quantity = itemData.quantity || 1;
-  document.getElementById('qtyDisplay').innerText = quantity;
+    // Jika sedang edit
+    if (itemData) {
+      quantity = itemData.quantity || 1;
+      document.getElementById('qtyDisplay').innerText = quantity;
 
-  setTimeout(() => {
-  const catatanInput = document.getElementById('catatan');
-  if (catatanInput && itemData.note) {
-    catatanInput.value = itemData.note;
-  }
+      setTimeout(() => {
+        const catatanInput = document.getElementById('catatan');
+        if (catatanInput && itemData.note) {
+          catatanInput.value = itemData.note;
+        }
 
-  const addonCheckboxes = document.querySelectorAll('input[name="addon"]');
-  addonCheckboxes.forEach(cb => {
-    const selected = itemData.addons.find(a => a.name === cb.value);
-    if (selected) cb.checked = true;
-  });
+        const addonCheckboxes = document.querySelectorAll('input[name="addon"]');
+        addonCheckboxes.forEach(cb => {
+          const selected = itemData.addons.find(a => a.name === cb.value);
+          if (selected) cb.checked = true;
+        });
 
-  calculateTotal();
-  }, 10);
-  } else {
-    document.getElementById('catatan').value = '';
-    quantity = 1;
-    document.getElementById('qtyDisplay').innerText = quantity;
-  }
+        calculateTotal();
+      }, 10);
+    } else {
+      document.getElementById('catatan').value = '';
+      quantity = 1;
+      document.getElementById('qtyDisplay').innerText = quantity;
+    }
 
-  console.log("ItemData.note:", itemData?.note);
+    console.log("ItemData.note:", itemData?.note);
 
     calculateTotal();
 
@@ -186,10 +248,9 @@
         return sum + Number(el.dataset.price); 
     }, 0);
     const total = (basePrice + addonTotal) * quantity;
-    // document.getElementById('totalPrice').innerText = Total: Rp${total.toLocaleString('id-ID')};
 
     // Tampilkan total harga di tombol
-document.getElementById('btnTotalHarga').innerText = `Rp${total.toLocaleString('id-ID')}`;
+    document.getElementById('btnTotalHarga').innerText = `Rp${total.toLocaleString('id-ID')}`;
   }
 
   function closeAddonModal() {
@@ -213,6 +274,11 @@ document.getElementById('btnTotalHarga').innerText = `Rp${total.toLocaleString('
   }
 
   function submitAddon() {
+    // Prevent multiple submissions
+    const submitButton = document.querySelector('.add-to-cart-btn');
+    if (submitButton.disabled) return;
+    submitButton.disabled = true;
+
     const basePrice = baseMenuPrices[currentMenu] || 0;
     const checked = document.querySelectorAll('input[name="addon"]:checked');
     const selected = Array.from(checked).map(item => ({
@@ -221,16 +287,24 @@ document.getElementById('btnTotalHarga').innerText = `Rp${total.toLocaleString('
     }));
 
     const catatan = document.getElementById('catatan').value;
-    // document.getElementById('catatan').value = '';
     console.log("CATATAN:", document.getElementById('catatan').value);
 
-    const image = menuImages[currentMenu];;
+    const image = menuImages[currentMenu];
+    
+    // Check if storage and cartKey are defined
+    if (typeof storage === 'undefined' || typeof cartKey === 'undefined') {
+      console.error('Storage or cartKey not defined');
+      submitButton.disabled = false;
+      return;
+    }
+
     const cart = JSON.parse(storage.getItem(cartKey)) || [];
 
     const menu_id = currentMenuId;
 
     if (!menu_id) {
       alert('Menu tidak ditemukan.');
+      submitButton.disabled = false;
       return;
     }
 
@@ -239,44 +313,69 @@ document.getElementById('btnTotalHarga').innerText = `Rp${total.toLocaleString('
       menu: currentMenu,
       basePrice: Number(basePrice),
       addons: selected,
-      quantity,
+      quantity: quantity, // Use the global quantity variable
       note: catatan,
       image: image 
     };
 
-  const isEdit = editingIndex !== null;
+    const isEdit = editingIndex !== null;
 
-  if (isEdit) {
-    cart[editingIndex] = newItem;
-  } else {
-    cart.push(newItem);
-  }
+    if (isEdit) {
+      cart[editingIndex] = newItem;
+      console.log('Editing item at index:', editingIndex);
+    } else {
+      // Check if item already exists in cart
+      const existingItemIndex = cart.findIndex(item => 
+        item.menu_id === menu_id && 
+        item.note === catatan &&
+        JSON.stringify(item.addons) === JSON.stringify(selected)
+      );
 
-  editingIndex = null; // reset setelah pakai
+      if (existingItemIndex > -1) {
+        // If item exists, increase quantity instead of adding new item
+        cart[existingItemIndex].quantity += quantity;
+        console.log('Updated existing item quantity');
+      } else {
+        cart.push(newItem);
+        console.log('Added new item to cart');
+      }
+    }
 
-  storage.setItem(cartKey, JSON.stringify(cart));
+    editingIndex = null; // reset setelah pakai
 
-  if (isEdit) {
-    Swal.fire({
-      icon: 'success',
-      title: 'Berhasil Diubah',
-      text: ${currentMenu} berhasil diperbarui.,
-      timer: 1600,
-      showConfirmButton: false
-    });
-  } else {
-    Swal.fire({
-      icon: 'success',
-      title: 'Berhasil Ditambahkan',
-      text: ${currentMenu} berhasil ditambahkan ke keranjang.,
-      timer: 1600,
-      showConfirmButton: false
-    });
-  }
+    storage.setItem(cartKey, JSON.stringify(cart));
+    console.log('Cart after update:', cart);
+
+    if (isEdit) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil Diubah',
+        text: `${currentMenu} berhasil diperbarui.`,
+        timer: 1600,
+        showConfirmButton: false
+      });
+    } else {
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil Ditambahkan',
+        text: `${currentMenu} berhasil ditambahkan ke keranjang.`,
+        timer: 1600,
+        showConfirmButton: false
+      });
+    }
 
     closeAddonModal();
     updateCartCount();
-    loadCart();
+    
+    // Check if loadCart function exists before calling it
+    if (typeof loadCart === 'function') {
+      loadCart();
+    }
+
+    // Re-enable the submit button after a delay
+    setTimeout(() => {
+      submitButton.disabled = false;
+    }, 1000);
   }
 
   function updateCartCount() {
