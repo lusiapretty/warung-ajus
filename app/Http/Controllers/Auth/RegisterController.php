@@ -17,20 +17,15 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
-      $request->validate([
-    'nama'     => 'required|string|max:255',
-    'email'    => 'required|string|email|max:255|unique:users',
-    'password' => [
-    'required',
-    'string',
-    'min:6',
-    'confirmed'
-    ],
-
-], [
-    'password.confirmed' => 'Ulangi kata sandi tidak cocok.',
-]);
-
+        $request->validate([
+            'nama'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => ['required','string','min:6','confirmed', 'regex:/^(?=.*[A-Z]).*$/'
+            ], 
+        ],[
+            'password.confirmed' => 'Ulangi kata sandi tidak cocok.',
+            'password.regex' => 'Kata sandi harus mengandung minimal 1 huruf kapital.',
+        ]);
 
         $user = User::create([
             'nama'     => $request->nama,
