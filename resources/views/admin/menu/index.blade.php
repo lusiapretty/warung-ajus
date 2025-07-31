@@ -184,13 +184,156 @@ $.ajaxSetup({
     }
 });
 
+// Fungsi validasi frontend
+function validateForm() {
+    let isValid = true;
+    let errorMessages = [];
+
+    // Validasi nama menu (wajib diisi dan hanya huruf)
+    const namaMenu = $('#nama_menu').val().trim();
+    if (!namaMenu) {
+        errorMessages.push('Nama menu wajib diisi.');
+        $('#nama_menu').addClass('is-invalid');
+        isValid = false;
+    } else if (!/^[a-zA-Z\s]+$/.test(namaMenu)) {
+        errorMessages.push('Nama menu hanya boleh berisi huruf dan spasi.');
+        $('#nama_menu').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#nama_menu').removeClass('is-invalid');
+    }
+
+    // Validasi harga (wajib diisi dan hanya angka)
+    const harga = $('#harga').val().trim();
+    if (!harga) {
+        errorMessages.push('Harga wajib diisi.');
+        $('#harga').addClass('is-invalid');
+        isValid = false;
+    } else if (!/^\d+$/.test(harga) || parseInt(harga) < 1) {
+        errorMessages.push('Harga hanya boleh berisi angka dan minimal 1.');
+        $('#harga').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#harga').removeClass('is-invalid');
+    }
+
+    // Validasi gambar (wajib untuk tambah, opsional untuk edit)
+    const isEditMode = $('#create-menu-form input[name="_method"]').val() === 'PUT';
+    const gambarFile = $('#gambar')[0].files[0];
+    
+    if (!isEditMode && !gambarFile) {
+        errorMessages.push('Gambar wajib dipilih.');
+        $('#gambar').addClass('is-invalid');
+        isValid = false;
+    } else if (gambarFile) {
+        // Validasi ukuran file (maksimal 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB dalam bytes
+        if (gambarFile.size > maxSize) {
+            errorMessages.push('Ukuran gambar maksimal 5MB.');
+            $('#gambar').addClass('is-invalid');
+            isValid = false;
+        } else if (!['image/jpeg', 'image/jpg', 'image/png'].includes(gambarFile.type)) {
+            errorMessages.push('Format gambar harus JPG, JPEG, atau PNG.');
+            $('#gambar').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#gambar').removeClass('is-invalid');
+        }
+    } else {
+        $('#gambar').removeClass('is-invalid');
+    }
+
+    // Tampilkan pesan error jika ada
+    if (!isValid) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validasi Gagal',
+            html: errorMessages.join('<br>'),
+            timer: 3000,
+            showConfirmButton: false,
+        });
+    }
+
+    return isValid;
+}
+
+// Update script yang sudah ada
 $(document).ready(function () {
+    // Validasi real-time untuk nama menu
+    $('#nama_menu').on('input', function() {
+        const value = $(this).val();
+        if (value && !/^[a-zA-Z\s]+$/.test(value)) {
+            $(this).addClass('is-invalid');
+            if (!$('#nama_menu_error').length) {
+                $(this).after('<div id="nama_menu_error" class="invalid-feedback">Nama menu hanya boleh berisi huruf dan spasi.</div>');
+            }
+        } else {
+            $(this).removeClass('is-invalid');
+            $('#nama_menu_error').remove();
+        }
+    });
+
+    // Validasi real-time untuk harga
+    $('#harga').on('input', function() {
+        const value = $(this).val();
+        if (value && (!/^\d+$/.test(value) || parseInt(value) < 1)) {
+            $(this).addClass('is-invalid');
+            if (!$('#harga_error').length) {
+                $(this).after('<div id="harga_error" class="invalid-feedback">Harga hanya boleh berisi angka dan minimal 1.</div>');
+            }
+        } else {
+            $(this).removeClass('is-invalid');
+            $('#harga_error').remove();
+        }
+    });
+
+    // Validasi real-time untuk gambar
+    $('#gambar').on('change', function() {
+        const file = this.files[0];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        
+        if (file) {
+            if (file.size > maxSize) {
+                $(this).addClass('is-invalid');
+                if (!$('#gambar_error').length) {
+                    $(this).after('<div id="gambar_error" class="invalid-feedback">Ukuran gambar maksimal 5MB.</div>');
+                }
+            } else if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+                $(this).addClass('is-invalid');
+                if (!$('#gambar_error').length) {
+                    $(this).after('<div id="gambar_error" class="invalid-feedback">Format gambar harus JPG, JPEG, atau PNG.</div>');
+                }
+            } else {
+                $(this).removeClass('is-invalid');
+                $('#gambar_error').remove();
+                
+                // Tampilkan preview gambar
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (!$('#image_preview').length) {
+                        $('#gambar').after('<div id="image_preview" class="mt-2"><img src="" style="max-width: 200px; max-height: 200px;" class="img-thumbnail"></div>');
+                    }
+                    $('#image_preview img').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        } else {
+            $(this).removeClass('is-invalid');
+            $('#gambar_error').remove();
+            $('#image_preview').remove();
+        }
+    });
     $('#btn-open-modal').on('click', function () {
         // Reset form & modal title
         $('#createMenuModalLabel').text('Tambah Menu');
         $('#create-menu-form')[0].reset();
         $('#create-menu-form input[name="_method"]').remove();
         $('#create-menu-form').attr('action', '/admin/menu/store');
+
+        // Reset validation states
+        $('.is_invalid').removeClass('is-invalid');
+        $('.invalid_feedback').remove();
+        $('#image_preview').remove(); 
 
         // Tampilkan modal
         $('#createMenuModal').modal('show');
@@ -246,6 +389,11 @@ $(document).ready(function () {
     $('#create-menu-form').on('submit', function (e) {
         e.preventDefault();
 
+        // Jalankan validasi frontend
+        if (!validateForm()) {
+            return false; // Jika validasi gagal, hentikan proses
+        }
+
         var form = $(this);
         var formData = new FormData(this);
         formData.append('_token', $('meta[name="csrf-token"]').attr('content')); 
@@ -256,15 +404,18 @@ $(document).ready(function () {
         var actionUrl = form.attr('action');
         var method = 'POST';
 
-        var gambarFile = $('#gambar')[0].files[0];
+        // var gambarFile = $('#gambar')[0].files[0];
         // for (var pair of formData.entries()) {
         //     console.log(pair[0]+ ': ' + pair[1]);
         // }
 
-        if (!gambarFile) {
-            alert('Gambar belum dipilih!');
-            return;
-        }
+        // Disable submit button untuk mencegah double submit
+        $('#btn-simpan').prop('disabled', true).text('Menyimpan...');
+
+        // if (!gambarFile) {
+        //     alert('Gambar belum dipilih!');
+        //     return;
+        // }
 
         $.ajax({
             url: actionUrl,
@@ -275,7 +426,7 @@ $(document).ready(function () {
             processData: false,
             success: function(response) {
                 console.log("Respons dari server:", response);
-                console.log("AJAX success:", response);
+                // console.log("AJAX success:", response);
 
                 if(response.success) {
                     let isUpdate = $('#create-menu-form input[name="_method"]').val() === 'PUT';
@@ -286,6 +437,10 @@ $(document).ready(function () {
                     // Reset form
                     $('#create-menu-form')[0].reset();
                     $('#create-menu-form input[name="_method"]').remove();
+                    $('.is-invalid').removeClass('is-invalid');
+                    $('.invalid-feedback').remove();
+                    $('#image_preview').remove();
+                    
                     // Reload table
                     $('#menu-table').DataTable().ajax.reload();
 
@@ -301,7 +456,11 @@ $(document).ready(function () {
                     });
                 }
                 else {
-                    alert("Error: " + response.message);
+                   Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Terjadi kesalahan saat menyimpan data.',
+                    });
                 }
             },
 
@@ -322,12 +481,19 @@ $(document).ready(function () {
                         showConfirmButton: false,
                     });
                 } else {
-                    alert('Error: ' + xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan pada server.',
+                    });
                 }
-                console.log("Error:", xhr.status, xhr.responseText);
-            }
+            },
+                complete: function() {
+                // Re-enable submit button
+                $('#btn-simpan').prop('disabled', false).text('Simpan');
+                }
 
-                });
+        });
 
                 return false;
             });
@@ -373,6 +539,11 @@ $(document).ready(function () {
             console.log("Data dari server untuk edit:", data);
 
             $('#createMenuModal').modal('show');
+
+            // Reset validation states
+            $('.is-invalid').removeClass('is-invalid');
+            $('.invalid-feedback').remove();
+            $('#image_preview').remove();
 
             // Isi field form dari data
             $('#nama_menu').val(data.nama_menu);
@@ -459,6 +630,14 @@ $(document).ready(function () {
             $('#createMenuModalLabel').text('Tambah Menu');
             $('#create-menu-form').attr('action', '/admin/menu/store');
             $('#create-menu-form input[name="_method"]').remove();
+
+            // Reset validation
+            $('.is-invalid').removeClass('is-invalid');
+            $('.invalid-feedback').remove();
+            $('#image_preview').remove();
+
+            // Gambar wajib untuk tambah menu
+            $('#gambar').attr('required', 'required');
         }
     });
 });

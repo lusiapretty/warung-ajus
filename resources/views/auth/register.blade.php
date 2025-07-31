@@ -169,7 +169,7 @@
 
       <div class="form-group">
         <div style="font-size: 12px; color: #555; margin-bottom: 4px;">
-          Password minimal 6 karakter dan mengandung huruf besar.
+          Password minimal 6 karakter dan mengandung huruf kapital.
         </div>
 
         <div class="input-wrapper">
