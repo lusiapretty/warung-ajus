@@ -70,6 +70,7 @@
                                 <option value="">Semua Pesanan</option>
                                 <option value="pending">Menunggu</option>
                                 <option value="processing">Diproses</option>
+                                <option value="ready">Pesanan Siap</option>
                                 <option value="completed">Selesai</option>
                                 <option value="cancelled">Dibatalkan</option>
                             </select>
@@ -142,7 +143,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" id="submitExportPdf">Export PDF</button>
+                <button type="button" class="btn btn-danger" id="submitExportPdf">Export</button>
             </div>
         </div>
     </form>
@@ -216,7 +217,7 @@ function showToast(type, title){
         icon: type,
         title: title,
         showConfirmButton: false,
-        timer: 1400,              // 1,8 detik
+        timer: 1400,              // 1,8 detik
         timerProgressBar: true,
         width: '400px',
         position: 'center', 
@@ -411,12 +412,13 @@ $(document).ready(function () {
         const statusColors = {
             'pending': 'text-warning',
             'processing': 'text-primary',
+            'ready': 'text-info',
             'completed': 'text-success',
             'cancelled': 'text-danger'
         };
 
         // Hapus semua class text-* sebelumnya
-        selectElement.classList.remove('text-warning', 'text-primary', 'text-success', 'text-danger');
+        selectElement.classList.remove('text-warning', 'text-primary', 'text-info', 'text-success', 'text-danger');
 
         // Tambahkan class baru sesuai value yang dipilih
         const selectedValue = selectElement.value;
@@ -446,4 +448,3 @@ $(document).ready(function () {
 </script>
 
 @endpush
-

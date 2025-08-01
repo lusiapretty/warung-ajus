@@ -19,6 +19,8 @@
                     'selesai'       => 'selesai',
                     'processing'    => 'Sedang Diproses',
                     'diproses'      => 'Sedang Diproses',
+                    'ready'         => 'Pesanan Siap',
+                    'pesanan_siap'  => 'Pesanan Siap',
                     'pending'       => 'Menunggu',
                     'menunggu'      => 'Menunggu',
                     'belum_dibayar' => 'Belum Dibayar'
@@ -28,6 +30,7 @@
                 @endphp
                 <span class="badge 
                     @if($order->status === 'selesai' || $order->status === 'completed') bg-success 
+                    @elseif($order->status === 'pesanan_siap' || $order->status === 'ready') text-white bg-info
                     @elseif($order->status === 'diproses' || $order->status === 'processing') bg-primary 
                     @elseif($order->status === 'menunggu' || $order->status === 'pending') bg-warning text-dark
                     @else bg-secondary 

@@ -63,7 +63,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:pending,processing,completed,cancelled',
+            'status' => 'required|in:pending,processing,ready,completed,cancelled',
         ]);
 
         if ($validator->fails()) {
@@ -133,53 +133,28 @@ class OrderController extends Controller
                 ))
                 ->addColumn('tipe_pesanan', fn($order) => $order->tipe_pesanan)
                 ->addColumn('no_meja', function ($order) {
-                    $form = '';
+                    // Untuk dine in, tampilkan nomor meja
                     if ($order->tipe_pesanan === 'dine_in') {
-                        $form = '
-                            <form method="POST" action="' . route('admin.orders.updateNoMeja', $order->id) . '" class="d-flex align-items-center gap-2 no-meja-form" data-order-id="' . $order->id . '">
-                                ' . csrf_field() . method_field('PATCH') . '
-                                <input type="number" name="no_meja" class="form-control form-control-sm" value="' . ($order->no_meja ?? '') . '" style="width: 70px;" min="1">
-                                <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fas fa-save"></i></button>
-                            </form>';
-                    }
-
-                    // Jika no_meja ada dan pesanan dine in, cek apakah sedang terpakai
-                    $statusBadge = '';
-                    if ($order->no_meja && $order->tipe_pesanan === 'dine_in') {
-                        $isMejaSedangDipakai = Order::where('no_meja', $order->no_meja)
-                            ->where('id', '!=', $order->id)
-                            ->where('tipe_pesanan', 'dine_in')
-                            ->where('payment_status', 'paid')
-                            ->whereIn('status', ['pending', 'processing'])
-                            ->exists();
-
-                        if (
-                            $order->no_meja &&
-                            $order->tipe_pesanan === 'dine_in' &&
-                            $order->payment_status === 'paid' &&
-                            in_array($order->status, ['pending', 'processing'])
-                        ) {
-                            $statusBadge = '<span class="badge bg-danger rounded-pill px-3 py-1">Terpakai</span>';
+                        if ($order->no_meja) {
+                            $tableDisplay = '<div class="text-center"><strong>Meja ' . $order->no_meja . '</strong>';
+                            
+                            // Tambahkan indikator jika meja sedang terpakai
+                            if (
+                                $order->payment_status === 'paid' &&
+                                in_array($order->status, ['pending', 'processing', 'ready'])
+                            ) {
+                                $tableDisplay .= '<br><p class="text-danger mb-0" style="font-size: 12px;"><i class="fas fa-circle" style="font-size: 9px;"></i> Terpakai</p>';
+                            }
+                            
+                            $tableDisplay .= '</div>';
+                            return $tableDisplay;
+                        } else {
+                            return '<div class="text-center"><span class="text-muted">-</span></div>';
                         }
-
-                        // $isMejaDipakai = Order::where('no_meja', $order->no_meja)
-                        //     ->where('tipe_pesanan', 'dine_in')
-                        //     ->where('payment_status', 'paid')
-                        //     ->whereIn('status', ['pending', 'processing', 'completed'])
-                        //     ->orderBy('id') // selain pesanan ini
-                        //     ->first();
-
-                        // if ($isMejaDipakai && $isMejaDipakai->id === $order->id) {
-                        //     $statusBadge = '<span class="badge bg-danger ms-2">Terpakai</span>';
-                        // }
+                    } else {
+                        // Untuk takeaway atau delivery
+                        return '<div class="text-center"><span class="text-muted">-</span></div>';
                     }
-                    return '
-                        <div class="d-flex flex-column gap-1">
-                            ' . $form . '
-                            <div class="d-flex justify-content-start align-items-center gap-2">'
-                                . $statusBadge .
-                            '</div>
-                        </div>';
                 })
                 ->addColumn('payment_status', function ($order) {
                     $label = [
@@ -218,6 +193,7 @@ class OrderController extends Controller
                     $statusLabels = [
                         'pending'    => ['label' => 'Menunggu', 'color' => 'warning'],
                         'processing' => ['label' => 'Sedang Diproses', 'color' => 'primary'],
+                        'ready'      => ['label' => 'Pesanan Siap', 'color' => 'info'],
                         'completed'  => ['label' => 'Selesai', 'color' => 'success'],
                         'cancelled'  => ['label' => 'Dibatalkan', 'color' => 'danger'],
                     ];
@@ -243,6 +219,7 @@ class OrderController extends Controller
                     $labels = [
                         'pending'    => 'Menunggu',
                         'processing' => 'Sedang Diproses',
+                        'ready'      => 'Pesanan Siap',
                         'completed'  => 'Selesai',
                         'cancelled'  => 'Dibatalkan',
                     ];
@@ -252,7 +229,7 @@ class OrderController extends Controller
                 ->addColumn('aksi', function ($order) {
                     $html = '<div class="d-flex flex-wrap gap-2">';
 
-                    if ($order->payment_status === 'paid' && $order->status === 'completed') {                   
+                    if ($order->payment_status === 'paid') {                   
                         $html .= '<a href="' . route('admin.orders.print', $order->id) . '" target="_blank" class="btn btn-success btn-sm">'
                             . '<i class="fas fa-print"></i> Cetak Struk</a>';
 
@@ -275,7 +252,7 @@ class OrderController extends Controller
     public function getMejaTerpakai()
     {
         $mejaTerpakai = Order::where('tipe_pesanan', 'dine_in')
-            ->whereIn('status', ['pending', 'processing']) // hanya pesanan aktif
+            ->whereIn('status', ['pending', 'processing', 'ready']) // hanya pesanan aktif
             ->whereNotNull('no_meja') // yang sudah diberi nomor meja
             ->pluck('no_meja')
             ->map(fn($meja) => (int)$meja)
@@ -307,7 +284,7 @@ class OrderController extends Controller
                 ->where('id', '!=', $order->id)
                 ->where('tipe_pesanan', 'dine_in')
                 ->where('payment_status', 'paid')
-                ->whereIn('status', ['pending', 'processing', 'completed'])
+                ->whereIn('status', ['pending', 'processing', 'ready', 'completed'])
                 ->whereNotNull('no_meja') 
                 ->exists();
 

@@ -33,7 +33,7 @@
                     @endif
                     <tr>
                         <td class="fw-bold text-start">Metode Pembayaran</td>
-                        <td>: {{ ucfirst($order->pembayaran) ?? '-' }}</td>
+                        <td>: {{ $order->pembayaran === 'midtrans' ? 'Online' : ucfirst($order->pembayaran ?? '-') }}</td>
                     </tr>
                     <tr>
                         <td class="fw-bold text-start">Status Pembayaran</td>
@@ -56,10 +56,11 @@
                         <td>: 
                             @php
                                 $orderColors = [
-                                    'pending' => 'warning',
+                                    'pending'    => 'warning',
                                     'processing' => 'primary',
-                                    'completed' => 'success',
-                                    'cancelled' => 'danger'
+                                    'ready'      => 'info',
+                                    'completed'  => 'success',
+                                    'cancelled'  => 'danger'
                                 ];
                             @endphp
                             <span class="badge bg-{{ $orderColors[$order->status] ?? 'light' }}">

@@ -18,7 +18,7 @@
         <li><a href="/">Beranda</a></li>
         <li><a href="{{ route('tentang')}}">Tentang Kami</a></li>
         <li><a href="{{ route('menu.makanan')}}">Menu</a></li>
-        <li><a href="{{ route('home')}}">Kontak</a></li>
+        <li><a href="{{ route('home')}}#lokasi-kami">Kontak</a></li>
       </ul>
     </div>
 
@@ -27,7 +27,7 @@
       <h3>Ikuti Kami</h3>
       <ul class="footer-social">
         <li>
-          <a href="https://instagram.com/warungajus" target="_blank">
+          <a href="https://www.instagram.com/warungajus.id/" target="_blank">
             <i class="fab fa-instagram"></i> @warungajus.id
           </a>
         </li>

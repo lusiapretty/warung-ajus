@@ -7,7 +7,7 @@
         <a href="{{ route('home')}}">Beranda</a>
         <a href="{{ route('tentang')}}">Tentang Kami</a>
         <a href="{{ route('menu.makanan')}}">Menu</a>
-        <a href="{{ route('home')}}">Kontak</a>
+        <a href="{{ route('home')}}#lokasi-kami">Kontak</a>
       </nav>
         <a href="{{ route('menu.makanan')}}" class="btn-pesan">Pesan Sekarang</a>
 

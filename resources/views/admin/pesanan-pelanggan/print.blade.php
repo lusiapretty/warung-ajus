@@ -10,7 +10,7 @@
             max-width: 300px;
             margin: auto;
         }
-        h2, h4, p {
+        h3, h4, p {
             text-align: center;
             margin: 0;
             padding: 5px;
@@ -29,10 +29,17 @@
             margin-top: 10px;
             padding-top: 10px;
         }
+
+        /* CSS untuk menyembunyikan tombol saat print */
+        @media print {
+            .print-button {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
-    <h2>WARUNG AJUS</h2>
+    <h3>WARUNG AJUS</h3>
     <h4>Struk Pembayaran</h4>
     <p>No Pesanan: {{ $order->order_id }}</p>
     <p>Tanggal: {{ $order->created_at->format('d-m-Y H:i') }}</p>
@@ -74,21 +81,21 @@
                 'expired' => 'Kedaluwarsa',
             ];
 
-            $statusPesanan = [
-                'pending' => 'Menunggu',
-                'processing' => 'Sedang Diproses',
-                'completed' => 'Selesai',
-                'cancelled' => 'Dibatalkan',
-            ];
+            // $statusPesanan = [
+            //     'pending' => 'Menunggu',
+            //     'processing' => 'Sedang Diproses',
+            //     'completed' => 'Selesai',
+            //     'cancelled' => 'Dibatalkan',
+            // ];
         @endphp
 
         <p>Status Pembayaran: {{ $statusPembayaran[$order->payment_status] ?? ucfirst($order->payment_status) }}</p>
-        <p>Status Pesanan: {{ $statusPesanan[$order->status] ?? ucfirst($order->status) }}</p>
+        {{-- <p>Status Pesanan: {{ $statusPesanan[$order->status] ?? ucfirst($order->status) }}</p> --}}
     </div>
 
     <p>Terima kasih!</p>
 
-    <p style="text-align: center; margin-top: 10px;">
+    <p class="print-button" style="text-align: center; margin-top: 10px;">
     <button onclick="window.print()">Cetak</button>
 </p>
 </body>

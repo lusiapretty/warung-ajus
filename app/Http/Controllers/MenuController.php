@@ -101,13 +101,13 @@ class MenuController extends Controller
             'gambar' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
         ],
 [
-        'nama_menu.required' => 'Nama menu harus diisi!',
-        'nama_menu.regex' => 'Nama menu hanya boleh berisi huruf dan spasi.',
-        'harga.required' => 'Harga harus diisi!',
-        'harga.numeric' => 'Harga hanya boleh berupa angka.',
-        'gambar.required' => 'Gambar harus diunggah!',
-        'gambar.mimes' => 'Format gambar harus jpg, jpeg, atau png.',
-        'gambar.max' => 'Ukuran gambar maksimal 5 MB.',
+            'nama_menu.required' => 'Nama menu harus diisi!',
+            'nama_menu.regex' => 'Nama menu hanya boleh berisi huruf dan spasi.',
+            'harga.required' => 'Harga harus diisi!',
+            'harga.numeric' => 'Harga hanya boleh berupa angka.',
+            'gambar.required' => 'Gambar harus diunggah!',
+            'gambar.mimes' => 'Format gambar harus jpg, jpeg, atau png.',
+            'gambar.max' => 'Ukuran gambar maksimal 5 MB.',
         ]);
 
         if ($request->hasFile('gambar')) {

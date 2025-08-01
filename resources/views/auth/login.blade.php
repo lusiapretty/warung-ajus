@@ -10,10 +10,11 @@
   
   <style>
     body {
+      background: url('../img/hero-bg.jpg') no-repeat center center fixed;
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #ff4e50, #f9d423);
+      /* background: linear-gradient(to right, #ff4e50, #f9d423); */
       height: 100vh;
       display: flex;
       justify-content: center;
