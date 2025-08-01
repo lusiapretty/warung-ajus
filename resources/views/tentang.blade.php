@@ -55,7 +55,7 @@
 
             <!-- Cabang 2 -->
             <div class="cabang-card" data-aos="fade-up">
-                <a href="https://www.google.com/maps?q=Jl.+Raya+Kampus+Unud+Jimbaran" target="_blank">
+                <a href="https://www.google.com/maps/place/Warung+Ajus/@-8.8002895,115.1713178,17z/data=!3m1!4b1!4m6!3m5!1s0x2dd244bbfe6b20fb:0xa1f6fe393df8f8a5!8m2!3d-8.8002895!4d115.1713178!16s%2Fg%2F11r94f0xtb?entry=ttu" target="_blank">
                     <img src="{{ asset('img/warung-ajus3.png') }}" alt="Cabang 2">
                 </a>
                 <h3>Cabang 2</h3>
@@ -64,8 +64,8 @@
 
             <!-- Cabang 3 -->
             <div class="cabang-card" data-aos="fade-up">
-                <a href="https://www.google.com/maps?q=Pasar+Kuliner+Malam+Kuta+Selatan" target="_blank">
-                    <img src="{{ asset('img/soto-ayam.png') }}" alt="Cabang 3">
+                <a href="https://maps.app.goo.gl/KUifS2uk47LgLKaV9?g_st=aw" target="_blank">
+                    <img src="{{ asset('img/warung-ajus-cabang3.jpg') }}" alt="Cabang 3">
                 </a>
                 <h3>Cabang 3</h3>
                 <p>Jl. Raya Kampus Unud, Jimbaran</p>

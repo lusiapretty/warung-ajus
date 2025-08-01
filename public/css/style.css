@@ -6,6 +6,10 @@ body {
   font-family: 'Poppins';
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px; /* Sesuaikan dengan tinggi navbar */
+}
 
 body::before {
   content: "";
@@ -576,7 +580,7 @@ body::before {
 .lokasi-section {
   background: url('../img/hero-bg.jpg') center center / cover no-repeat;
   color: #f4f4f4;
-  padding: 100px 20px;
+  padding: 60px 20px ;
   font-family: 'Poppins', sans-serif;
 }
 
